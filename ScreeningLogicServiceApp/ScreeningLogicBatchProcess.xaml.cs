@@ -1,10 +1,15 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using ScreeningLogicServiceApp.Repository;
+using ScreeningLogicServiceApp.Views;
+using System;
+using System.Configuration;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using ScreeningLogicServiceApp.Views;
 
 namespace ScreeningLogicServiceApp
 {
@@ -13,10 +18,13 @@ namespace ScreeningLogicServiceApp
     /// </summary>
     public partial class ScreeningLogicBatchProcess : Window
     {
+        private readonly IConfigurationRepository _repo;
+
         public ScreeningLogicBatchProcess()
         {
             InitializeComponent();
             Loaded += OnLoaded;
+            _repo = App.Services.GetRequiredService<IConfigurationRepository>();
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
@@ -38,8 +46,48 @@ namespace ScreeningLogicServiceApp
             var dashboard = DashboardViewControl;
             try
             {
-                // Simulate work
-                await Task.Run(async () => { await Task.Delay(3000); });
+                // Determine parameter from UI (selected count) or set your own value
+                string param = "";
+                var selected = dashboard?.NamesCombo?.SelectedItem as ComboBoxItem;
+                if (selected?.Content is string s && !string.IsNullOrWhiteSpace(s))
+                    param = s; // e.g., "5"
+
+                await _repo.UpdateMaxRecordsToProcessAsync(int.Parse(param));
+
+                // Read full path to WinForms EXE from configuration
+                string? exePath = ConfigurationManager.AppSettings["ScreeningLogicWinFormsPath"];
+                if (string.IsNullOrWhiteSpace(exePath))
+                    throw new InvalidOperationException("Missing appSettings key 'ScreeningLogicWinFormsPath' in App.config.");
+
+                exePath = exePath.Trim();
+                if (!File.Exists(exePath))
+                    throw new FileNotFoundException($"WinForms app not found at configured path: {exePath}");
+
+                // Build arguments: WinForms expects "--hidden" as argument.
+                string args = "--hidden";
+
+                var psi = new ProcessStartInfo
+                {
+                    FileName = exePath,
+                    Arguments = args,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    WorkingDirectory = Path.GetDirectoryName(exePath) ?? AppDomain.CurrentDomain.BaseDirectory,
+                };
+
+                using var process = Process.Start(psi);
+                if (process == null)
+                {
+                    throw new InvalidOperationException("Failed to start external process.");
+                }
+
+                // Await process exit; WinForms app calls this.Close() when done
+                await process.WaitForExitAsync();
+            }
+            catch (Exception ex)
+            {
+                // Optional: log or notify; keeping simple with a message box for now
+                MessageBox.Show($"Failed to run external process: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {

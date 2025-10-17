@@ -40,6 +40,7 @@ namespace ScreeningLogicServiceApp
 
             // Repositories using factory
             services.AddScoped<IPasswordRepository, PasswordRepository>();
+            services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
 
             Services = services.BuildServiceProvider();
         }
