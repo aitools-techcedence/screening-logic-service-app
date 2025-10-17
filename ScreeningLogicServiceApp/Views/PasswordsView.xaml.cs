@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Controls.Primitives;
 using Microsoft.Extensions.DependencyInjection;
 using ScreeningLogicServiceApp.Repository;
 
@@ -11,6 +12,8 @@ namespace ScreeningLogicServiceApp.Views
     public partial class PasswordsView : UserControl
     {
         private readonly IPasswordRepository _repo;
+        private bool _slSyncing;
+        private bool _jxSyncing;
 
         public PasswordsView()
         {
@@ -45,13 +48,18 @@ namespace ScreeningLogicServiceApp.Views
                 SlAccountTextBox.Text = slAccount;
                 SlUserTextBox.Text = slUser;
                 SlPasswordBox.Password = slPassword;
+                if (FindName("SlPasswordTextBox") is TextBox slPwText) slPwText.Text = slPassword;
 
                 JxUserTextBox.Text = map.GetValueOrDefault("JusticeExchangeUserId", string.Empty) ?? string.Empty;
-                JxPasswordBox.Password = map.GetValueOrDefault("JusticeExchangePassword", string.Empty) ?? string.Empty;
+                string jxPw = map.GetValueOrDefault("JusticeExchangePassword", string.Empty) ?? string.Empty;
+                JxPasswordBox.Password = jxPw;
+                if (FindName("JxPasswordTextBox") is TextBox jxPwText) jxPwText.Text = jxPw;
+
+                ShowStatus(string.Empty, false);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to load configuration: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowStatus($"Failed to load configuration: {ex.Message}", true, isError: true);
             }
         }
 
@@ -98,6 +106,7 @@ namespace ScreeningLogicServiceApp.Views
 
             if (!allValid)
             {
+                ShowStatus("Please correct the highlighted fields.", true, isError: true);
                 return; // highlight only
             }
 
@@ -113,12 +122,114 @@ namespace ScreeningLogicServiceApp.Views
                 };
 
                 await _repo.UpsertConfigValuesAsync(updates);
-                MessageBox.Show("Configuration updated.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                ShowStatus("Configuration Updated", true);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to update configuration: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowStatus($"Failed to update configuration: {ex.Message}", true, isError: true);
             }
+        }
+
+        private void ShowStatus(string message, bool visible, bool isError = false)
+        {
+            if (StatusTextBlock == null) return;
+            StatusTextBlock.Text = message;
+            StatusTextBlock.FontWeight = isError ? FontWeights.Normal : FontWeights.SemiBold;
+            StatusTextBlock.FontSize = isError ? 16 : 24; // larger for success
+            StatusTextBlock.Foreground = isError ? Brushes.IndianRed : new SolidColorBrush(Color.FromRgb(46, 125, 50));
+            StatusTextBlock.Visibility = visible && !string.IsNullOrWhiteSpace(message) ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        // Toggle handlers
+        private void SlShowToggle_Checked(object sender, RoutedEventArgs e)
+        {
+            if (FindName("SlPasswordTextBox") is TextBox slPwText)
+            {
+                slPwText.Text = SlPasswordBox.Password;
+                slPwText.Visibility = Visibility.Visible;
+                SlPasswordBox.Visibility = Visibility.Collapsed;
+            }
+            if (sender is ToggleButton tb) tb.Content = "Hide";
+        }
+
+        private void SlShowToggle_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (FindName("SlPasswordTextBox") is TextBox slPwText)
+            {
+                SlPasswordBox.Password = slPwText.Text;
+                SlPasswordBox.Visibility = Visibility.Visible;
+                slPwText.Visibility = Visibility.Collapsed;
+            }
+            if (sender is ToggleButton tb) tb.Content = "Show";
+        }
+
+        private void JxShowToggle_Checked(object sender, RoutedEventArgs e)
+        {
+            if (FindName("JxPasswordTextBox") is TextBox jxPwText)
+            {
+                jxPwText.Text = JxPasswordBox.Password;
+                jxPwText.Visibility = Visibility.Visible;
+                JxPasswordBox.Visibility = Visibility.Collapsed;
+            }
+            if (sender is ToggleButton tb) tb.Content = "Hide";
+        }
+
+        private void JxShowToggle_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (FindName("JxPasswordTextBox") is TextBox jxPwText)
+            {
+                JxPasswordBox.Password = jxPwText.Text;
+                JxPasswordBox.Visibility = Visibility.Visible;
+                jxPwText.Visibility = Visibility.Collapsed;
+            }
+            if (sender is ToggleButton tb) tb.Content = "Show";
+        }
+
+        // Sync handlers to keep both controls in sync when user edits either
+        private void SlPasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (_slSyncing) return;
+            try
+            {
+                _slSyncing = true;
+                if (FindName("SlPasswordTextBox") is TextBox slPwText)
+                    slPwText.Text = SlPasswordBox.Password;
+            }
+            finally { _slSyncing = false; }
+        }
+
+        private void SlPasswordTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_slSyncing) return;
+            try
+            {
+                _slSyncing = true;
+                SlPasswordBox.Password = ((TextBox)sender).Text;
+            }
+            finally { _slSyncing = false; }
+        }
+
+        private void JxPasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (_jxSyncing) return;
+            try
+            {
+                _jxSyncing = true;
+                if (FindName("JxPasswordTextBox") is TextBox jxPwText)
+                    jxPwText.Text = JxPasswordBox.Password;
+            }
+            finally { _jxSyncing = false; }
+        }
+
+        private void JxPasswordTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_jxSyncing) return;
+            try
+            {
+                _jxSyncing = true;
+                JxPasswordBox.Password = ((TextBox)sender).Text;
+            }
+            finally { _jxSyncing = false; }
         }
     }
 }
