@@ -1,0 +1,47 @@
+<UserControl x:Class="ScreeningLogicServiceApp.Views.NotificationsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="900" d:DesignHeight="600">
+    <Grid Background="#E9F6FB" Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Margin="40,20,0,10" Text="Email to notify when:" FontSize="26" FontWeight="SemiBold" Foreground="#1B5B6A"/>
+
+        <Grid Grid.Row="1" Margin="40,40,40,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="280"/>
+                <ColumnDefinition Width="320"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Login Password failure:" FontSize="18" Foreground="#1B5B6A" VerticalAlignment="Center"/>
+            <TextBox x:Name="LoginEmailTextBox" Grid.Row="0" Grid.Column="1" Height="32" Margin="0,0,0,8"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="QC Test failure:" FontSize="18" Foreground="#1B5B6A" VerticalAlignment="Center"/>
+            <TextBox x:Name="QCTestEmailTextBox" Grid.Row="2" Grid.Column="1" Height="32" Margin="0,0,0,8"/>
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Application/Process failure:" TextWrapping="Wrap" FontSize="18" Foreground="#1B5B6A" VerticalAlignment="Center"/>
+            <TextBox x:Name="AppProcessEmailTextBox" Grid.Row="4" Grid.Column="1" Height="32" Margin="0,0,0,8"/>
+
+            <TextBlock Grid.Row="6" Grid.Column="0" Text="Screening Logic or JusticeXchange not online:" TextWrapping="Wrap" FontSize="18" Foreground="#1B5B6A" VerticalAlignment="Center"/>
+            <TextBox x:Name="NotOnlineEmailTextBox" Grid.Row="6" Grid.Column="1" Height="32" Margin="0,0,0,8"/>
+        </Grid>
+
+        <Button Grid.Row="2" Content="Save" Width="160" Height="44" HorizontalAlignment="Right" Margin="0,0,10,10" Style="{StaticResource UpdateButtonStyle}" Click="SaveButton_Click"/>
+    </Grid>
+</UserControl>

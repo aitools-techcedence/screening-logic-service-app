@@ -1,0 +1,99 @@
+<UserControl x:Class="ScreeningLogicServiceApp.Views.BehaviorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="800" d:DesignHeight="500">
+    <Grid Background="#E9F6FB" Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title and description -->
+        <StackPanel Grid.Row="0" Margin="40,20,0,10">
+            <TextBlock Text="Select the application processing speed" FontSize="26" FontWeight="SemiBold" Foreground="#1B5B6A"/>
+            <TextBlock Text="All values below represent wait time ranges between filling values in request and navigation between found matches and bookings" TextWrapping="Wrap" FontSize="16" Foreground="#1B5B6A" Margin="0,6,0,0"/>
+        </StackPanel>
+
+        <!-- Options -->
+        <Grid Grid.Row="2" Margin="60,20,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="240"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Slow:" FontSize="20" Foreground="#1B5B6A" VerticalAlignment="Center"/>
+            <RadioButton Grid.Row="0" Grid.Column="1" Content="5 - 14 seconds" GroupName="Speed" FontSize="18" Padding="12,6" HorizontalAlignment="Left" Margin="0,0,0,8">
+                <RadioButton.Template>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="box" CornerRadius="4" Background="White" BorderBrush="#E0E0E0" BorderThickness="1" Padding="12,6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="box" Property="BorderBrush" Value="#9DB9C2"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="box" Property="BorderBrush" Value="#1B5B6A"/>
+                                <Setter TargetName="box" Property="Background" Value="#F6FCFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </RadioButton.Template>
+            </RadioButton>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Standard:" FontSize="20" Foreground="#1B5B6A" VerticalAlignment="Center"/>
+            <RadioButton Grid.Row="2" Grid.Column="1" Content="3 - 7 seconds" GroupName="Speed" IsChecked="True" FontSize="18" Padding="12,6" HorizontalAlignment="Left" Margin="0,0,0,8">
+                <RadioButton.Template>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="box" CornerRadius="4" Background="White" BorderBrush="#E0E0E0" BorderThickness="1" Padding="12,6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="box" Property="BorderBrush" Value="#9DB9C2"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="box" Property="BorderBrush" Value="#1B5B6A"/>
+                                <Setter TargetName="box" Property="Background" Value="#F6FCFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </RadioButton.Template>
+            </RadioButton>
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Fast:" FontSize="20" Foreground="#1B5B6A" VerticalAlignment="Center"/>
+            <RadioButton Grid.Row="4" Grid.Column="1" Content="2 - 4 seconds" GroupName="Speed" FontSize="18" Padding="12,6" HorizontalAlignment="Left" Margin="0,0,0,8">
+                <RadioButton.Template>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="box" CornerRadius="4" Background="White" BorderBrush="#E0E0E0" BorderThickness="1" Padding="12,6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="box" Property="BorderBrush" Value="#9DB9C2"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="box" Property="BorderBrush" Value="#1B5B6A"/>
+                                <Setter TargetName="box" Property="Background" Value="#F6FCFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </RadioButton.Template>
+            </RadioButton>
+        </Grid>
+
+        <Button Grid.Row="3" Content="Save" Width="160" Height="44" HorizontalAlignment="Right" Margin="0,0,10,10" Style="{StaticResource UpdateButtonStyle}" Click="SaveButton_Click"/>
+    </Grid>
+</UserControl>

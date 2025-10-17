@@ -1,0 +1,132 @@
+<UserControl x:Class="ScreeningLogicServiceApp.Views.QCView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="900" d:DesignHeight="600">
+    <Grid Background="#E9F6FB" Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="40,20,40,10">
+            <TextBlock Text="Test Applicants" FontSize="26" FontWeight="SemiBold" Foreground="#1B5B6A"/>
+            <TextBlock Text="List names that you want to run prior to processing orders" FontSize="18" Foreground="#1B5B6A"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1" Margin="40,10,40,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="60"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="How many test names to run prior to each batch?" FontSize="18" Foreground="#1B5B6A" VerticalAlignment="Center"/>
+            <TextBox x:Name="CountTextBox" Grid.Column="1" Width="60" Height="32" Margin="30,0,0,0" TextChanged="CountTextBox_TextChanged" PreviewTextInput="CountTextBox_PreviewTextInput" LostFocus="CountTextBox_LostFocus"/>
+        </Grid>
+
+        <Grid Grid.Row="2" x:Name="RowsGrid" Margin="40,20,40,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="40"/>
+                <ColumnDefinition Width="220"/>
+                <ColumnDefinition Width="220"/>
+                <ColumnDefinition Width="180"/>
+                <ColumnDefinition Width="180"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Header row -->
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="Last Name" FontWeight="SemiBold" FontSize="18" Foreground="#1B5B6A"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="First Name" FontWeight="SemiBold" FontSize="18" Foreground="#1B5B6A"/>
+            <TextBlock Grid.Row="0" Grid.Column="3" Text="DOB" FontWeight="SemiBold" FontSize="18" Foreground="#1B5B6A"/>
+            <TextBlock Grid.Row="0" Grid.Column="4" Text="Expected Match #" FontWeight="SemiBold" FontSize="18" Foreground="#1B5B6A"/>
+
+            <!-- Rows 1 - 10 (predefined, hidden via code when needed) -->
+            <!-- Row 1 -->
+            <TextBlock x:Name="Idx1" Grid.Row="1" Grid.Column="0" Text="1" VerticalAlignment="Center" FontSize="18"/>
+            <TextBox x:Name="Last1" Grid.Row="1" Grid.Column="1" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="First1" Grid.Row="1" Grid.Column="2" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="Dob1" Grid.Row="1" Grid.Column="3" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="Match1" Grid.Row="1" Grid.Column="4" Height="32" Margin="0,0,8,6"/>
+
+            <!-- Row 2 -->
+            <TextBlock x:Name="Idx2" Grid.Row="2" Grid.Column="0" Text="2" VerticalAlignment="Center" FontSize="18"/>
+            <TextBox x:Name="Last2" Grid.Row="2" Grid.Column="1" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="First2" Grid.Row="2" Grid.Column="2" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="Dob2" Grid.Row="2" Grid.Column="3" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="Match2" Grid.Row="2" Grid.Column="4" Height="32" Margin="0,0,8,6"/>
+
+            <!-- Row 3 -->
+            <TextBlock x:Name="Idx3" Grid.Row="3" Grid.Column="0" Text="3" VerticalAlignment="Center" FontSize="18"/>
+            <TextBox x:Name="Last3" Grid.Row="3" Grid.Column="1" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="First3" Grid.Row="3" Grid.Column="2" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="Dob3" Grid.Row="3" Grid.Column="3" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="Match3" Grid.Row="3" Grid.Column="4" Height="32" Margin="0,0,8,6"/>
+
+            <!-- Row 4 -->
+            <TextBlock x:Name="Idx4" Grid.Row="4" Grid.Column="0" Text="4" VerticalAlignment="Center" FontSize="18"/>
+            <TextBox x:Name="Last4" Grid.Row="4" Grid.Column="1" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="First4" Grid.Row="4" Grid.Column="2" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="Dob4" Grid.Row="4" Grid.Column="3" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="Match4" Grid.Row="4" Grid.Column="4" Height="32" Margin="0,0,8,6"/>
+
+            <!-- Row 5 -->
+            <TextBlock x:Name="Idx5" Grid.Row="5" Grid.Column="0" Text="5" VerticalAlignment="Center" FontSize="18"/>
+            <TextBox x:Name="Last5" Grid.Row="5" Grid.Column="1" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="First5" Grid.Row="5" Grid.Column="2" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="Dob5" Grid.Row="5" Grid.Column="3" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="Match5" Grid.Row="5" Grid.Column="4" Height="32" Margin="0,0,8,6"/>
+
+            <!-- Row 6 -->
+            <TextBlock x:Name="Idx6" Grid.Row="6" Grid.Column="0" Text="6" VerticalAlignment="Center" FontSize="18"/>
+            <TextBox x:Name="Last6" Grid.Row="6" Grid.Column="1" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="First6" Grid.Row="6" Grid.Column="2" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="Dob6" Grid.Row="6" Grid.Column="3" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="Match6" Grid.Row="6" Grid.Column="4" Height="32" Margin="0,0,8,6"/>
+
+            <!-- Row 7 -->
+            <TextBlock x:Name="Idx7" Grid.Row="7" Grid.Column="0" Text="7" VerticalAlignment="Center" FontSize="18"/>
+            <TextBox x:Name="Last7" Grid.Row="7" Grid.Column="1" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="First7" Grid.Row="7" Grid.Column="2" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="Dob7" Grid.Row="7" Grid.Column="3" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="Match7" Grid.Row="7" Grid.Column="4" Height="32" Margin="0,0,8,6"/>
+
+            <!-- Row 8 -->
+            <TextBlock x:Name="Idx8" Grid.Row="8" Grid.Column="0" Text="8" VerticalAlignment="Center" FontSize="18"/>
+            <TextBox x:Name="Last8" Grid.Row="8" Grid.Column="1" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="First8" Grid.Row="8" Grid.Column="2" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="Dob8" Grid.Row="8" Grid.Column="3" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="Match8" Grid.Row="8" Grid.Column="4" Height="32" Margin="0,0,8,6"/>
+
+            <!-- Row 9 -->
+            <TextBlock x:Name="Idx9" Grid.Row="9" Grid.Column="0" Text="9" VerticalAlignment="Center" FontSize="18"/>
+            <TextBox x:Name="Last9" Grid.Row="9" Grid.Column="1" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="First9" Grid.Row="9" Grid.Column="2" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="Dob9" Grid.Row="9" Grid.Column="3" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="Match9" Grid.Row="9" Grid.Column="4" Height="32" Margin="0,0,8,6"/>
+
+            <!-- Row 10 -->
+            <TextBlock x:Name="Idx10" Grid.Row="10" Grid.Column="0" Text="10" VerticalAlignment="Center" FontSize="18"/>
+            <TextBox x:Name="Last10" Grid.Row="10" Grid.Column="1" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="First10" Grid.Row="10" Grid.Column="2" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="Dob10" Grid.Row="10" Grid.Column="3" Height="32" Margin="0,0,8,6"/>
+            <TextBox x:Name="Match10" Grid.Row="10" Grid.Column="4" Height="32" Margin="0,0,8,6"/>
+        </Grid>
+
+        <Button Grid.Row="3" Content="Save" Width="160" Height="44" HorizontalAlignment="Right" Margin="0,0,10,10" Style="{StaticResource UpdateButtonStyle}" Click="SaveButton_Click"/>
+    </Grid>
+</UserControl>
