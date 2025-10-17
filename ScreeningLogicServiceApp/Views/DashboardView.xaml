@@ -43,17 +43,14 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Border Grid.Column="0" BorderBrush="#9DB9C2" BorderThickness="1" CornerRadius="4" Background="#F6FCFF" Padding="20" Margin="15">
-                <TextBlock Text="Stopped" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" Foreground="#1B5B6A"/>
+            <Border x:Name="StoppedCard" Grid.Column="0" BorderBrush="#1B5B6A" BorderThickness="2" CornerRadius="4" Background="#D2EEF7" Padding="20" Margin="15">
+                <TextBlock Text="Stopped" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="#1B5B6A" TextWrapping="Wrap" TextAlignment="Center"/>
             </Border>
-            <Border Grid.Column="1" BorderBrush="#9DB9C2" BorderThickness="1" CornerRadius="4" Background="#F6FCFF" Padding="20" Margin="15">
-                <TextBlock Text="Processing Names" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" Foreground="#1B5B6A"/>
+            <Border x:Name="ScreeningLogicCard" Grid.Column="1" BorderBrush="#9DB9C2" BorderThickness="1" CornerRadius="4" Background="#F6FCFF" Padding="20" Margin="15">
+                <TextBlock Text="Processing Names in Screening Logic" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" Foreground="#1B5B6A" TextWrapping="Wrap"/>
             </Border>
-            <Border Grid.Column="2" BorderBrush="#9DB9C2" BorderThickness="1" CornerRadius="4" Background="#F6FCFF" Padding="20" Margin="15">
-                <StackPanel>
-                    <TextBlock Text="Stand By" HorizontalAlignment="Center" FontSize="22" Foreground="#1B5B6A"/>
-                    <TextBlock Text="(waiting to process next batch)" HorizontalAlignment="Center" FontSize="16" Foreground="#1B5B6A"/>
-                </StackPanel>
+            <Border x:Name="JusticeExchangeCard" Grid.Column="2" BorderBrush="#9DB9C2" BorderThickness="1" CornerRadius="4" Background="#F6FCFF" Padding="20" Margin="15">
+                <TextBlock Text="Processing Names in Justice Exchange" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" Foreground="#1B5B6A" TextWrapping="Wrap"/>
             </Border>
         </Grid>
 

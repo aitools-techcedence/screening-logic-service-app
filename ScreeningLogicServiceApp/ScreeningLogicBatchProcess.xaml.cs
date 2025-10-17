@@ -16,11 +16,17 @@ namespace ScreeningLogicServiceApp
         public ScreeningLogicBatchProcess()
         {
             InitializeComponent();
+            Loaded += OnLoaded;
+        }
 
-            var dashboard = FindChild<DashboardView>(MainTabs);
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            var dashboard = DashboardViewControl; // named element from XAML
             if (dashboard?.NamesCombo != null)
             {
                 dashboard.NamesCombo.SelectedIndex = 2; // 0:1, 1:2, 2:5, 3:10, 4:25, 5:50
+                dashboard.StartClicked -= StartButton_Click; // avoid duplicate
+                dashboard.StopClicked -= StopButton_Click;
                 dashboard.StartClicked += StartButton_Click;
                 dashboard.StopClicked += StopButton_Click;
             }
@@ -29,19 +35,24 @@ namespace ScreeningLogicServiceApp
         private async void StartButton_Click(object? sender, RoutedEventArgs e)
         {
             AppCloseButton.IsEnabled = false;
+            var dashboard = DashboardViewControl;
             try
             {
+                // Simulate work
                 await Task.Run(async () => { await Task.Delay(3000); });
             }
             finally
             {
                 AppCloseButton.IsEnabled = true;
+                // After completion, return highlight to Stopped and re-enable Start button
+                dashboard?.HighlightStopped();
+                dashboard?.SetStartEnabled(true);
             }
         }
 
         private void StopButton_Click(object? sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Stopped.");
+            // Dashboard handles its own UI state
         }
 
         private void AppCloseButton_Click(object sender, RoutedEventArgs e)

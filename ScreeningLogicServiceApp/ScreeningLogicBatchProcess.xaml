@@ -22,7 +22,7 @@
             </TabControl.ItemContainerStyle>
 
             <TabItem Header="Dashboard">
-                <views:DashboardView/>
+                <views:DashboardView x:Name="DashboardViewControl"/>
             </TabItem>
 
             <TabItem Header="Passwords">
