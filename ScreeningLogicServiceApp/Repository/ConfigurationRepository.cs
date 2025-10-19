@@ -42,5 +42,14 @@ namespace ScreeningLogicServiceApp.Repository
                 await context.SaveChangesAsync();
             }
         }
+
+        public async Task UndoStop()
+        {
+            using var context = _contextFactory.CreateDbContext();
+            ProcessStartAndStop pss = await context.ProcessStartAndStops.FirstAsync();
+            pss.Stop = false;
+            context.ProcessStartAndStops.Update(pss);
+            await context.SaveChangesAsync();
+        }
     }
 }

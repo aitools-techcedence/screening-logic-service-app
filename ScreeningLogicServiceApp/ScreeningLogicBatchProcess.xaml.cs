@@ -54,6 +54,7 @@ namespace ScreeningLogicServiceApp
             DashboardViewControl.ClearInfoMessage();
             DashboardViewControl.SetStopEnabled(true);
             AppCloseButton.IsEnabled = false;
+            await _configurationRepo.UndoStop();
             var dashboard = DashboardViewControl;
             try
             {
