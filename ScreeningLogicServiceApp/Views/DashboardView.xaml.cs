@@ -20,7 +20,7 @@ namespace ScreeningLogicServiceApp.Views
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
             SetStartEnabled(false);
-            HighlightScreeningLogic();
+            HighlightScreeningLogicProcessing();
             ClearInfoMessage();
             StartClicked?.Invoke(this, e);
         }
@@ -38,16 +38,17 @@ namespace ScreeningLogicServiceApp.Views
             SetInactive(ScreeningLogicCard);
             SetInactive(JusticeExchangeCard);
             SetStartEnabled(true);
+            SetStopEnabled(false);
         }
 
-        public void HighlightScreeningLogic()
+        public void HighlightScreeningLogicProcessing()
         {
             SetInactive(StoppedCard);
             SetActive(ScreeningLogicCard);
             SetInactive(JusticeExchangeCard);
         }
 
-        public void HighlightJusticeExchange()
+        public void HighlightJusticeExchangeProcessing()
         {
             SetInactive(StoppedCard);
             SetInactive(ScreeningLogicCard);
@@ -73,9 +74,23 @@ namespace ScreeningLogicServiceApp.Views
             StartButton.IsEnabled = enabled;
         }
 
+        public void SetStopEnabled(bool enabled)
+        {
+            StopButton.IsEnabled = enabled;
+        }
+
         public void ShowInfoMessage(string message)
         {
             InfoTextBlock.Text = message;
+            InfoTextBlock.Foreground = new SolidColorBrush(Color.FromRgb(27, 91, 106)); // info color
+            InfoTextBlock.Visibility = string.IsNullOrWhiteSpace(message) ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        public void ShowWarningMessage(string message)
+        {
+            InfoTextBlock.Text = message;
+            InfoTextBlock.Foreground = Brushes.DarkOrange;
+            InfoTextBlock.FontWeight = FontWeights.SemiBold;
             InfoTextBlock.Visibility = string.IsNullOrWhiteSpace(message) ? Visibility.Collapsed : Visibility.Visible;
         }
 

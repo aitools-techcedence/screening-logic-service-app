@@ -46,7 +46,9 @@ namespace ScreeningLogicServiceApp
         }
 
         private async void StartButton_Click(object? sender, RoutedEventArgs e)
-        {     
+        {
+            DashboardViewControl.ClearInfoMessage();
+            DashboardViewControl.SetStopEnabled(true);
             AppCloseButton.IsEnabled = false;
             var dashboard = DashboardViewControl;
             try
@@ -94,7 +96,7 @@ namespace ScreeningLogicServiceApp
 
                 // *********** Start of Justice Exchange WinForms app process ***********
                 // Highlight JusticeExchangeCard while running JE process
-                dashboard?.HighlightJusticeExchange();
+                dashboard?.HighlightJusticeExchangeProcessing();
 
                 string? jeExePath = ConfigurationManager.AppSettings["JusticeExchangeWinFormsPath"];
                 if (string.IsNullOrWhiteSpace(jeExePath))
@@ -134,12 +136,14 @@ namespace ScreeningLogicServiceApp
                 // After completion, return highlight to Stopped and re-enable Start button
                 dashboard?.HighlightStopped();
                 dashboard?.SetStartEnabled(true);
+                DashboardViewControl.SetStopEnabled(false);
                 DashboardViewControl.ClearInfoMessage();
             }
         }
 
         private async void StopButton_Click(object? sender, RoutedEventArgs e)
         {
+            DashboardViewControl.ShowWarningMessage("Attempting to stop process. Please wait...");
             await _configurationRepo.StopProcess();
         }
 
