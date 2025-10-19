@@ -94,36 +94,39 @@ namespace ScreeningLogicServiceApp
                 }
                 // *********** End of Screening Logic WinForms app process ***********
 
-                // *********** Start of Justice Exchange WinForms app process ***********
-                // Highlight JusticeExchangeCard while running JE process
-                dashboard?.HighlightJusticeExchangeProcessing();
-
-                string? jeExePath = ConfigurationManager.AppSettings["JusticeExchangeWinFormsPath"];
-                if (string.IsNullOrWhiteSpace(jeExePath))
-                    throw new InvalidOperationException("Missing appSettings key 'JusticeExchangeWinFormsPath' in App.config.");
-
-                jeExePath = jeExePath.Trim();
-                if (!File.Exists(jeExePath))
-                    throw new FileNotFoundException($"WinForms app not found at configured path: {jeExePath}");
-
-                var jePsi = new ProcessStartInfo
+                var processStartStop = await _configurationRepo.GetProcessStartAndStopAsync();
+                if (!processStartStop.Stop)
                 {
-                    FileName = jeExePath,
-                    Arguments = "--hidden",
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    WorkingDirectory = Path.GetDirectoryName(jeExePath) ?? AppDomain.CurrentDomain.BaseDirectory,
-                };
+                    // *********** Start of Justice Exchange WinForms app process ***********
+                    // Highlight JusticeExchangeCard while running JE process
+                    dashboard?.HighlightJusticeExchangeProcessing();
 
-                using (var jeProcess = Process.Start(jePsi))
-                {
-                    if (jeProcess == null)
-                        throw new InvalidOperationException("Failed to start Justice Exchange external process.");
+                    string? jeExePath = ConfigurationManager.AppSettings["JusticeExchangeWinFormsPath"];
+                    if (string.IsNullOrWhiteSpace(jeExePath))
+                        throw new InvalidOperationException("Missing appSettings key 'JusticeExchangeWinFormsPath' in App.config.");
 
-                    await jeProcess.WaitForExitAsync();
+                    jeExePath = jeExePath.Trim();
+                    if (!File.Exists(jeExePath))
+                        throw new FileNotFoundException($"WinForms app not found at configured path: {jeExePath}");
+
+                    var jePsi = new ProcessStartInfo
+                    {
+                        FileName = jeExePath,
+                        Arguments = "--hidden",
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        WorkingDirectory = Path.GetDirectoryName(jeExePath) ?? AppDomain.CurrentDomain.BaseDirectory,
+                    };
+
+                    using (var jeProcess = Process.Start(jePsi))
+                    {
+                        if (jeProcess == null)
+                            throw new InvalidOperationException("Failed to start Justice Exchange external process.");
+
+                        await jeProcess.WaitForExitAsync();
+                    }
+                    // *********** End of Justice Exchange WinForms app process ***********
                 }
-                // *********** End of Justice Exchange WinForms app process ***********
-
             }
             catch (Exception ex)
             {
