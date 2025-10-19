@@ -20,7 +20,7 @@ namespace ScreeningLogicServiceApp.Views
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
             SetStartEnabled(false);
-            HighlightProcessing();
+            HighlightScreeningLogic();
             ClearInfoMessage();
             StartClicked?.Invoke(this, e);
         }
@@ -40,14 +40,14 @@ namespace ScreeningLogicServiceApp.Views
             SetStartEnabled(true);
         }
 
-        public void HighlightProcessing()
+        public void HighlightScreeningLogic()
         {
             SetInactive(StoppedCard);
             SetActive(ScreeningLogicCard);
             SetInactive(JusticeExchangeCard);
         }
 
-        public void HighlightStandby()
+        public void HighlightJusticeExchange()
         {
             SetInactive(StoppedCard);
             SetInactive(ScreeningLogicCard);
