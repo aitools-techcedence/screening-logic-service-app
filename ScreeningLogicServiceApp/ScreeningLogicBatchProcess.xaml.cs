@@ -39,9 +39,13 @@ namespace ScreeningLogicServiceApp
             }
 
             int inProcessCount = await _scrappingRepo.GetBatchInProcessInJusticeExchangeAsync();
-            if (inProcessCount > 0)
+            if (inProcessCount > 1)
             {
                 DashboardViewControl.ShowInfoMessage($"There are {inProcessCount} records awaiting to be processed in JusticeExchange. Click on start to continue processing.");
+            }
+            else if (inProcessCount == 1)
+            {
+                DashboardViewControl.ShowInfoMessage("There is 1 record awaiting to be processed in JusticeExchange. Click on start to continue processing.");
             }
         }
 
