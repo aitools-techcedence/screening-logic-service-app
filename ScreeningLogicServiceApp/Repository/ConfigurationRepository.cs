@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ScreeningLogicServiceApp.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ScreeningLogicServiceApp.Repository
 {
@@ -20,7 +15,7 @@ namespace ScreeningLogicServiceApp.Repository
         public async Task<ProcessStartAndStop> GetProcessStartAndStopAsync()
         {
             using var context = _contextFactory.CreateDbContext();
-            
+
             return await context.ProcessStartAndStops.FirstOrDefaultAsync();
         }
 
@@ -36,5 +31,16 @@ namespace ScreeningLogicServiceApp.Repository
             }
         }
 
+        public async Task StopProcess()
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var config = await context.ProcessStartAndStops.FirstAsync();
+            if (config != null)
+            {
+                config.Stop = true;
+                context.ProcessStartAndStops.Update(config);
+                await context.SaveChangesAsync();
+            }
+        }
     }
 }

@@ -1,9 +1,4 @@
 ﻿using ScreeningLogicServiceApp.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ScreeningLogicServiceApp.Repository
 {
@@ -11,5 +6,6 @@ namespace ScreeningLogicServiceApp.Repository
     {
         Task<ProcessStartAndStop> GetProcessStartAndStopAsync();
         Task UpdateMaxRecordsToProcessAsync(int maxRecordsToProcess);
+        Task StopProcess();
     }
 }

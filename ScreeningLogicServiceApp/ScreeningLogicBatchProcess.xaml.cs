@@ -98,9 +98,9 @@ namespace ScreeningLogicServiceApp
             }
         }
 
-        private void StopButton_Click(object? sender, RoutedEventArgs e)
+        private async void StopButton_Click(object? sender, RoutedEventArgs e)
         {
-            // Dashboard handles its own UI state
+            await _repo.StopProcess();
         }
 
         private void AppCloseButton_Click(object sender, RoutedEventArgs e)
