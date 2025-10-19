@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ScreeningLogicServiceApp"
         xmlns:views="clr-namespace:ScreeningLogicServiceApp.Views"
         mc:Ignorable="d"
-        Title="Screening Logic Service" Height="650" Width="1100" Background="#E9F6FB">
+        Title="Screening Logic Service" Height="700" Width="1200" Background="#E9F6FB">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
