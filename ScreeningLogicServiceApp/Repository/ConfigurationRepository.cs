@@ -16,7 +16,7 @@ namespace ScreeningLogicServiceApp.Repository
         {
             using var context = _contextFactory.CreateDbContext();
 
-            return await context.ProcessStartAndStops.FirstOrDefaultAsync();
+            return await context.ProcessStartAndStops.AsNoTracking().FirstOrDefaultAsync();
         }
 
         public async Task UpdateMaxRecordsToProcessAsync(int maxRecordsToProcess)
