@@ -1,12 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using ScreeningLogicServiceApp.Repository;
-using ScreeningLogicServiceApp.Views;
 using System;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -18,16 +15,18 @@ namespace ScreeningLogicServiceApp
     /// </summary>
     public partial class ScreeningLogicBatchProcess : Window
     {
-        private readonly IConfigurationRepository _repo;
+        private readonly IConfigurationRepository _configurationRepo;
+        private readonly IScreeningLogicScrappingRepository _scrappingRepo;
 
         public ScreeningLogicBatchProcess()
         {
             InitializeComponent();
             Loaded += OnLoaded;
-            _repo = App.Services.GetRequiredService<IConfigurationRepository>();
+            _configurationRepo = App.Services.GetRequiredService<IConfigurationRepository>();
+            _scrappingRepo = App.Services.GetRequiredService<IScreeningLogicScrappingRepository>();
         }
 
-        private void OnLoaded(object sender, RoutedEventArgs e)
+        private async void OnLoaded(object sender, RoutedEventArgs e)
         {
             var dashboard = DashboardViewControl; // named element from XAML
             if (dashboard?.NamesCombo != null)
@@ -38,10 +37,16 @@ namespace ScreeningLogicServiceApp
                 dashboard.StartClicked += StartButton_Click;
                 dashboard.StopClicked += StopButton_Click;
             }
+
+            int inProcessCount = await _scrappingRepo.GetBatchInProcessInJusticeExchangeAsync();
+            if (inProcessCount > 0)
+            {
+                DashboardViewControl.ShowInfoMessage($"There are {inProcessCount} records awaiting to be processed in JusticeExchange. Click on start to continue processing.");
+            }
         }
 
         private async void StartButton_Click(object? sender, RoutedEventArgs e)
-        {
+        {     
             AppCloseButton.IsEnabled = false;
             var dashboard = DashboardViewControl;
             try
@@ -52,7 +57,7 @@ namespace ScreeningLogicServiceApp
                 if (selected?.Content is string s && !string.IsNullOrWhiteSpace(s))
                     param = s; // e.g., "5"
 
-                await _repo.UpdateMaxRecordsToProcessAsync(int.Parse(param));
+                await _configurationRepo.UpdateMaxRecordsToProcessAsync(int.Parse(param));
 
                 // Read full path to WinForms EXE from configuration
                 string? exePath = ConfigurationManager.AppSettings["ScreeningLogicWinFormsPath"];
@@ -95,12 +100,13 @@ namespace ScreeningLogicServiceApp
                 // After completion, return highlight to Stopped and re-enable Start button
                 dashboard?.HighlightStopped();
                 dashboard?.SetStartEnabled(true);
+                DashboardViewControl.ClearInfoMessage();
             }
         }
 
         private async void StopButton_Click(object? sender, RoutedEventArgs e)
         {
-            await _repo.StopProcess();
+            await _configurationRepo.StopProcess();
         }
 
         private void AppCloseButton_Click(object sender, RoutedEventArgs e)

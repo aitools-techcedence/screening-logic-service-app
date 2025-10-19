@@ -21,12 +21,14 @@ namespace ScreeningLogicServiceApp.Views
         {
             SetStartEnabled(false);
             HighlightProcessing();
+            ClearInfoMessage();
             StartClicked?.Invoke(this, e);
         }
 
         private void StopButton_Click(object sender, RoutedEventArgs e)
         {
             HighlightStopped();
+            ClearInfoMessage();
             StopClicked?.Invoke(this, e);
         }
 
@@ -69,6 +71,18 @@ namespace ScreeningLogicServiceApp.Views
         public void SetStartEnabled(bool enabled)
         {
             StartButton.IsEnabled = enabled;
+        }
+
+        public void ShowInfoMessage(string message)
+        {
+            InfoTextBlock.Text = message;
+            InfoTextBlock.Visibility = string.IsNullOrWhiteSpace(message) ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        public void ClearInfoMessage()
+        {
+            InfoTextBlock.Text = string.Empty;
+            InfoTextBlock.Visibility = Visibility.Collapsed;
         }
     }
 }
