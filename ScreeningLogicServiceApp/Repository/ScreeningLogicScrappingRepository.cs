@@ -11,14 +11,19 @@ namespace ScreeningLogicServiceApp.Repository
         {
             _contextFactory = contextFactory;
         }
-
-        // Returns the number of JusticeExchangeBatch records currently in process (EndDateTime is null)
-        // for ScreeningLogic batches that have completed (EndDateTime is not null).
-        public async Task<int> GetBatchInProcessInJusticeExchangeAsync()
+        
+        public async Task<int> GetScreeningLogicScrappingInProgressInJusticeExchangeAsync()
         {
             using var context = _contextFactory.CreateDbContext();
-            return await context.JusticeExchangeBatches
-                .CountAsync(j => j.EndDateTime == null && j.ScreeningLogicBatch.EndDateTime != null);
+            var openScreeningLogicBatchId = await context.JusticeExchangeBatches
+                .Where(b => b.EndDateTime == null)
+                .Select(b => b.ScreeningLogicBatchId)
+                .FirstOrDefaultAsync();
+
+            var screeningLogicScrappingCount = await context.ScreeningLogicScrappings
+                                                    .Where(s => s.ScreeningLogicBatchId == openScreeningLogicBatchId && !s.IsSentToBackgroundScreening)
+                                                    .CountAsync();
+            return screeningLogicScrappingCount;
         }
     }
 }

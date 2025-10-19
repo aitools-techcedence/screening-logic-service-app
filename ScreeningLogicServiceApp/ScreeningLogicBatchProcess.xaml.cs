@@ -38,7 +38,7 @@ namespace ScreeningLogicServiceApp
                 dashboard.StopClicked += StopButton_Click;
             }
 
-            int inProcessCount = await _scrappingRepo.GetBatchInProcessInJusticeExchangeAsync();
+            int inProcessCount = await _scrappingRepo.GetScreeningLogicScrappingInProgressInJusticeExchangeAsync();
             if (inProcessCount > 1)
             {
                 DashboardViewControl.ShowInfoMessage($"There are {inProcessCount} records awaiting to be processed in JusticeExchange. Click on start to continue processing.");

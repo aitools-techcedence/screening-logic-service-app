@@ -2,6 +2,6 @@
 {
     public interface IScreeningLogicScrappingRepository
     {
-        Task<int> GetBatchInProcessInJusticeExchangeAsync();
+        Task<int> GetScreeningLogicScrappingInProgressInJusticeExchangeAsync();
     }
 }
