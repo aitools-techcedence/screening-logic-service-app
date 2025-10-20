@@ -26,8 +26,7 @@ namespace ScreeningLogicServiceApp.Views
         }
 
         private void StopButton_Click(object sender, RoutedEventArgs e)
-        {
-            HighlightStopped();
+        {            
             ClearInfoMessage();
             StopClicked?.Invoke(this, e);
         }
