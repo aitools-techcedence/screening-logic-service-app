@@ -17,6 +17,7 @@ namespace ScreeningLogicServiceApp
     {
         private readonly IConfigurationRepository _configurationRepo;
         private readonly IScreeningLogicScrappingRepository _scrappingRepo;
+        private bool _stopping = false;
 
         public ScreeningLogicBatchProcess()
         {
@@ -146,11 +147,26 @@ namespace ScreeningLogicServiceApp
                 dashboard?.SetStartEnabled(true);
                 DashboardViewControl.SetStopEnabled(false);
                 DashboardViewControl.ClearInfoMessage();
+
+                if (_stopping)
+                {
+                    _stopping = false;
+                    int inProcessCount = await _scrappingRepo.GetScreeningLogicScrappingInProgressInJusticeExchangeAsync();
+                    if (inProcessCount > 1)
+                    {
+                        DashboardViewControl.ShowInfoMessage($"There are {inProcessCount} records awaiting to be processed in JusticeExchange. Click on start to continue processing.");
+                    }
+                    else if (inProcessCount == 1)
+                    {
+                        DashboardViewControl.ShowInfoMessage("There is 1 record awaiting to be processed in JusticeExchange. Click on start to continue processing.");
+                    }
+                }
             }
         }
 
         private async void StopButton_Click(object? sender, RoutedEventArgs e)
         {
+            _stopping = true;
             DashboardViewControl.ShowWarningMessage("Attempting to stop process. Please wait...");
             await _configurationRepo.StopProcess();
         }
