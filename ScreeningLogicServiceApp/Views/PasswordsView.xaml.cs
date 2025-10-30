@@ -29,7 +29,7 @@ namespace ScreeningLogicServiceApp.Views
                 var keys = new[]
                 {
                     "ScreeningLogicAccount",
-                    "ScreeningLogicUser",
+                    "ScreeningLogicUserId",
                     "ScreeningLogicPassword",
                     "JusticeExchangeUserId",
                     "JusticeExchangePassword"
@@ -38,7 +38,7 @@ namespace ScreeningLogicServiceApp.Views
                 var map = await _repo.GetConfigValuesAsync(keys);
 
                 string slAccount = map.GetValueOrDefault("ScreeningLogicAccount", string.Empty) ?? string.Empty;
-                string slUser = map.GetValueOrDefault("ScreeningLogicUser", string.Empty) ?? string.Empty;
+                string slUser = map.GetValueOrDefault("ScreeningLogicUserId", string.Empty) ?? string.Empty;
                 string slPassword = map.GetValueOrDefault("ScreeningLogicPassword", string.Empty) ?? string.Empty;
 
                 // Fallbacks if only ScreeningLogicAccount exists
@@ -115,7 +115,7 @@ namespace ScreeningLogicServiceApp.Views
                 var updates = new Dictionary<string, string>
                 {
                     ["ScreeningLogicAccount"] = SlAccountTextBox.Text.Trim(),
-                    ["ScreeningLogicUser"] = SlUserTextBox.Text.Trim(),
+                    ["ScreeningLogicUserId"] = SlUserTextBox.Text.Trim(),
                     ["ScreeningLogicPassword"] = SlPasswordBox.Password,
                     ["JusticeExchangeUserId"] = JxUserTextBox.Text.Trim(),
                     ["JusticeExchangePassword"] = JxPasswordBox.Password
