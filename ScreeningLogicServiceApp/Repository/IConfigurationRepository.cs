@@ -8,5 +8,7 @@ namespace ScreeningLogicServiceApp.Repository
         Task UpdateMaxRecordsToProcessAsync(int maxRecordsToProcess);
         Task StopProcess();
         Task UndoStop();
+        Task<string?> GetBehaviourAsync();
+        Task SaveBehaviourAsync(string value);
     }
 }

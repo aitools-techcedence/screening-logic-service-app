@@ -51,5 +51,35 @@ namespace ScreeningLogicServiceApp.Repository
             context.ProcessStartAndStops.Update(pss);
             await context.SaveChangesAsync();
         }
+
+        public async Task<string?> GetBehaviourAsync()
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var config = await context.Configurations.AsNoTracking().FirstOrDefaultAsync(c => c.ConfigKey == "Behaviour");
+            return config?.ConfigValue;
+        }
+
+        public async Task SaveBehaviourAsync(string value)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var config = await context.Configurations.FirstOrDefaultAsync(c => c.ConfigKey == "Behaviour");
+            if (config == null)
+            {
+                config = new Configuration
+                {
+                    ConfigKey = "Behaviour",
+                    ConfigValue = value,
+                    UserId = null
+                };
+                context.Configurations.Add(config);
+            }
+            else
+            {
+                config.ConfigValue = value;
+                context.Configurations.Update(config);
+            }
+
+            await context.SaveChangesAsync();
+        }
     }
 }
