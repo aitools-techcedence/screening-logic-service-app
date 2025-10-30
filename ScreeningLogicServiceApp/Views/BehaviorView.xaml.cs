@@ -15,6 +15,20 @@ namespace ScreeningLogicServiceApp.Views
             InitializeComponent();
             // Resolve repository from App.Services at runtime
             _configRepo = App.Services?.GetService(typeof(IConfigurationRepository)) as IConfigurationRepository;
+
+            // Hide success message when user changes selection
+            rbSlow.Checked += (_, __) => tbSuccess.Visibility = Visibility.Collapsed;
+            rbStandard.Checked += (_, __) => tbSuccess.Visibility = Visibility.Collapsed;
+            rbFast.Checked += (_, __) => tbSuccess.Visibility = Visibility.Collapsed;
+
+            // Clear success message when tab is unloaded (navigated away)
+            Unloaded += BehaviorView_Unloaded;
+        }
+
+        private void BehaviorView_Unloaded(object sender, RoutedEventArgs e)
+        {
+            tbSuccess.Text = string.Empty;
+            tbSuccess.Visibility = Visibility.Collapsed;
         }
 
         private async void BehaviorView_Loaded(object sender, RoutedEventArgs e)
@@ -39,6 +53,10 @@ namespace ScreeningLogicServiceApp.Views
                         rbStandard.IsChecked = true; // default
                         break;
                 }
+
+                // Ensure success message is hidden on load
+                tbSuccess.Text = string.Empty;
+                tbSuccess.Visibility = Visibility.Collapsed;
             }
             catch
             {
@@ -57,6 +75,10 @@ namespace ScreeningLogicServiceApp.Views
             try
             {
                 await _configRepo.SaveBehaviourAsync(selected);
+
+                // Show success message centered below radio buttons
+                tbSuccess.Text = "Behaviour has been updated successfully";
+                tbSuccess.Visibility = Visibility.Visible;
             }
             catch
             {

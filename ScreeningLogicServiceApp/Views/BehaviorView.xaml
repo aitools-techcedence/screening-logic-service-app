@@ -20,7 +20,9 @@
  </StackPanel>
 
  <!-- Options -->
- <Grid Grid.Row="2" Margin="60,20,0,0">
+ <!-- Use a StackPanel so we can place the success message centered under the radio grid -->
+ <StackPanel Grid.Row="2">
+ <Grid Margin="60,20,0,0">
  <Grid.RowDefinitions>
  <RowDefinition Height="Auto"/>
  <RowDefinition Height="10"/>
@@ -34,7 +36,7 @@
  </Grid.ColumnDefinitions>
 
  <TextBlock Grid.Row="0" Grid.Column="0" Text="Slow:" FontSize="20" Foreground="#1B5B6A" VerticalAlignment="Center"/>
- <RadioButton x:Name="rbSlow" Grid.Row="0" Grid.Column="1" Content="5 - 14 seconds" GroupName="Speed" FontSize="18" Padding="12,6" HorizontalAlignment="Left" Margin="0,0,0,8">
+ <RadioButton x:Name="rbSlow" Grid.Row="0" Grid.Column="1" Content="5 -14 seconds" GroupName="Speed" FontSize="18" Padding="12,6" HorizontalAlignment="Left" Margin="0,0,0,8">
  <RadioButton.Template>
  <ControlTemplate TargetType="RadioButton">
  <Border x:Name="box" CornerRadius="4" Background="White" BorderBrush="#E0E0E0" BorderThickness="1" Padding="12,6">
@@ -54,7 +56,7 @@
  </RadioButton>
 
  <TextBlock Grid.Row="2" Grid.Column="0" Text="Standard:" FontSize="20" Foreground="#1B5B6A" VerticalAlignment="Center"/>
- <RadioButton x:Name="rbStandard" Grid.Row="2" Grid.Column="1" Content="3 - 7 seconds" GroupName="Speed" IsChecked="True" FontSize="18" Padding="12,6" HorizontalAlignment="Left" Margin="0,0,0,8">
+ <RadioButton x:Name="rbStandard" Grid.Row="2" Grid.Column="1" Content="3 -7 seconds" GroupName="Speed" IsChecked="True" FontSize="18" Padding="12,6" HorizontalAlignment="Left" Margin="0,0,0,8">
  <RadioButton.Template>
  <ControlTemplate TargetType="RadioButton">
  <Border x:Name="box" CornerRadius="4" Background="White" BorderBrush="#E0E0E0" BorderThickness="1" Padding="12,6">
@@ -74,7 +76,7 @@
  </RadioButton>
 
  <TextBlock Grid.Row="4" Grid.Column="0" Text="Fast:" FontSize="20" Foreground="#1B5B6A" VerticalAlignment="Center"/>
- <RadioButton x:Name="rbFast" Grid.Row="4" Grid.Column="1" Content="2 - 4 seconds" GroupName="Speed" FontSize="18" Padding="12,6" HorizontalAlignment="Left" Margin="0,0,0,8">
+ <RadioButton x:Name="rbFast" Grid.Row="4" Grid.Column="1" Content="2 -4 seconds" GroupName="Speed" FontSize="18" Padding="12,6" HorizontalAlignment="Left" Margin="0,0,0,8">
  <RadioButton.Template>
  <ControlTemplate TargetType="RadioButton">
  <Border x:Name="box" CornerRadius="4" Background="White" BorderBrush="#E0E0E0" BorderThickness="1" Padding="12,6">
@@ -93,6 +95,10 @@
  </RadioButton.Template>
  </RadioButton>
  </Grid>
+
+ <!-- Success message centered horizontally below the radio options -->
+ <TextBlock x:Name="tbSuccess" Text="" Visibility="Collapsed" Foreground="#2E7D32" FontSize="24" FontWeight="SemiBold" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,12,0,0"/>
+ </StackPanel>
 
  <Button Grid.Row="3" Content="Save" Width="260" Height="64" FontSize="22" HorizontalAlignment="Right" Margin="0,30,40,10" Style="{StaticResource UpdateButtonStyle}" Click="SaveButton_Click"/>
  </Grid>
