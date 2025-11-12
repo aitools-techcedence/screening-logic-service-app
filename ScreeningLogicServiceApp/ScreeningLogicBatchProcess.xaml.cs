@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using ScreeningLogicServiceApp.Repository;
-using System;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
@@ -148,20 +147,15 @@ namespace ScreeningLogicServiceApp
                 DashboardViewControl.SetStopEnabled(false);
                 DashboardViewControl.ClearInfoMessage();
 
-                if (_stopping)
-                {
-                    _stopping = false;
-                    int inProcessCount = await _scrappingRepo.GetScreeningLogicScrappingInProgressInJusticeExchangeAsync();
-                    if (inProcessCount > 1)
-                    {
-                        DashboardViewControl.ShowInfoMessage($"There are {inProcessCount} records awaiting to be processed in JusticeExchange. Click on start to continue processing.");
-                    }
-                    else if (inProcessCount == 1)
-                    {
-                        DashboardViewControl.ShowInfoMessage("There is 1 record awaiting to be processed in JusticeExchange. Click on start to continue processing.");
-                    }
-                }
+                // Delete all records from all tables except Configuration table and ProcessStartAndStop table
+                await DeleteAllRecords();
             }
+        }
+
+        private async Task DeleteAllRecords() 
+        { 
+            // Delegate to repository method to perform FK-safe bulk deletes
+            await _scrappingRepo.DeleteAllExceptConfigurationAndProcessAsync();
         }
 
         private async void StopButton_Click(object? sender, RoutedEventArgs e)

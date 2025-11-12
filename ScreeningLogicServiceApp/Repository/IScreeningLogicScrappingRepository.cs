@@ -3,5 +3,6 @@
     public interface IScreeningLogicScrappingRepository
     {
         Task<int> GetScreeningLogicScrappingInProgressInJusticeExchangeAsync();
+        Task DeleteAllExceptConfigurationAndProcessAsync();
     }
 }
