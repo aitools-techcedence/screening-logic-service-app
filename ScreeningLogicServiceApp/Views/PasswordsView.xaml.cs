@@ -118,7 +118,8 @@ namespace ScreeningLogicServiceApp.Views
                     ["ScreeningLogicUserId"] = SlUserTextBox.Text.Trim(),
                     ["ScreeningLogicPassword"] = SlPasswordBox.Password,
                     ["JusticeExchangeUserId"] = JxUserTextBox.Text.Trim(),
-                    ["JusticeExchangePassword"] = JxPasswordBox.Password
+                    ["JusticeExchangePassword"] = JxPasswordBox.Password,
+                    ["ChangePasswordRequiredInJusticeExchange"] = "No"
                 };
 
                 await _repo.UpsertConfigValuesAsync(updates);

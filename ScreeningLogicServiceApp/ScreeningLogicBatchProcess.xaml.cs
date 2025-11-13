@@ -49,7 +49,7 @@ namespace ScreeningLogicServiceApp
             }
         }
 
-        private async void StartButton_Click(object? sender, RoutedEventArgs e)
+        private async Task ExecuteScreeningProcess()
         {
             DashboardViewControl.ClearInfoMessage();
             DashboardViewControl.SetStopEnabled(true);
@@ -58,6 +58,14 @@ namespace ScreeningLogicServiceApp
             var dashboard = DashboardViewControl;
             try
             {
+                // Check if JE password change is required; if yes, show message and skip processing
+                var changePwdRequired = await _configurationRepo.GetConfigurationValueAsync("ChangePasswordRequiredInJusticeExchange");
+                if (string.Equals(changePwdRequired, "Yes", StringComparison.OrdinalIgnoreCase))
+                {
+                    DashboardViewControl.ShowInfoMessage("Previous login attempt failed in Justice Exchange due to Invalid Password or Password Expired. Please update password.");
+                    return; // Skip rest; finally block will execute because this is inside async void
+                }
+
                 // Determine parameter from UI (selected count) or set your own value
                 string param = "";
                 var selected = dashboard?.NamesCombo?.SelectedItem as ComboBoxItem;
@@ -150,6 +158,11 @@ namespace ScreeningLogicServiceApp
                 // Delete all records from all tables except Configuration table and ProcessStartAndStop table
                 await DeleteAllRecords();
             }
+        }
+
+        private async void StartButton_Click(object? sender, RoutedEventArgs e)
+        {
+            await ExecuteScreeningProcess();
         }
 
         private async Task DeleteAllRecords() 
