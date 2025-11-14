@@ -6,6 +6,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Threading;
 
 namespace ScreeningLogicServiceApp
 {
@@ -17,6 +18,10 @@ namespace ScreeningLogicServiceApp
         private readonly IConfigurationRepository _configurationRepo;
         private readonly IScreeningLogicScrappingRepository _scrappingRepo;
         private bool _stopping = false;
+        private CancellationTokenSource? _cts;
+        private Task? _continuousTask;
+        private bool _isContinuousRunning = false;
+        private bool _passwordChangeDetected = false; // track to preserve message and stop loop
 
         public ScreeningLogicBatchProcess()
         {
@@ -56,14 +61,21 @@ namespace ScreeningLogicServiceApp
             AppCloseButton.IsEnabled = false;
             await _configurationRepo.UndoStop();
             var dashboard = DashboardViewControl;
+            bool passwordStop = false; // local flag for this execution
             try
             {
-                // Check if JE password change is required; if yes, show message and skip processing
+                // Check if JE password change is required; if yes, show message and stop continuous processing
                 var changePwdRequired = await _configurationRepo.GetConfigurationValueAsync("ChangePasswordRequiredInJusticeExchange");
                 if (string.Equals(changePwdRequired, "Yes", StringComparison.OrdinalIgnoreCase))
                 {
-                    DashboardViewControl.ShowInfoMessage("Previous login attempt failed in Justice Exchange due to Invalid Password or Password Expired. Please update password.");
-                    return; // Skip rest; finally block will execute because this is inside async void
+                    _passwordChangeDetected = true;
+                    passwordStop = true;
+                    DashboardViewControl.ShowInfoMessage("Previous login attempt failed in Justice Exchange due to Invalid Password or Password Expired. Please update password. Scheduled processing stopped.");
+                    _cts?.Cancel(); // cancel continuous loop
+                    _isContinuousRunning = false;
+                    dashboard?.SetStartEnabled(true);
+                    DashboardViewControl.SetStopEnabled(false);
+                    return; // skip remaining processing
                 }
 
                 // Determine parameter from UI (selected count) or set your own value
@@ -163,20 +175,140 @@ namespace ScreeningLogicServiceApp
             finally
             {
                 AppCloseButton.IsEnabled = true;
-                // After completion, return highlight to Stopped and re-enable Start button
+                // After completion, return highlight to Stopped and conditionally re-enable Start button
                 dashboard?.HighlightStopped();
-                dashboard?.SetStartEnabled(true);
+                if (!_isContinuousRunning)
+                {
+                    dashboard?.SetStartEnabled(true);
+                }
                 DashboardViewControl.SetStopEnabled(false);
-                DashboardViewControl.ClearInfoMessage();
-
+                if (!passwordStop) // preserve message if password triggered stop
+                {
+                    DashboardViewControl.ClearInfoMessage();
+                }
                 // Delete all records from all tables except Configuration table and ProcessStartAndStop table
                 await DeleteAllRecords();
             }
         }
 
+        // Continuous scheduling logic
+        private async Task RunContinuousProcessingAsync(CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
+            {
+                var now = DateTime.Now;
+                if (IsWithinWeeklyWindow(now) && !IsInMaintenanceWindow(now))
+                {
+                    await ExecuteScreeningProcess();
+                }
+                else
+                {
+                    // Show waiting message if outside window
+                    if (IsInMaintenanceWindow(now))
+                    {
+                        DashboardViewControl.ShowInfoMessage("Maintenance window active. Waiting until 3:15 AM to resume.");
+                    }
+                    else if (!IsWithinWeeklyWindow(now))
+                    {
+                        DashboardViewControl.ShowInfoMessage("Outside allowed weekly window. Waiting for Sunday 7 PM or until Friday 8 PM.");
+                    }
+                }
+
+                // Compute next allowed start (30 minutes after completion or current time if we skipped)
+                DateTime earliest = DateTime.Now.AddMinutes(30);
+                DateTime nextStart = GetNextAllowedStart(earliest);
+                TimeSpan delay = nextStart - DateTime.Now;
+                if (delay < TimeSpan.Zero)
+                    delay = TimeSpan.Zero;
+
+                try
+                {
+                    await Task.Delay(delay, token);
+                }
+                catch (TaskCanceledException)
+                {
+                    break;
+                }
+            }
+            // After loop finishes ensure Start button enabled
+            _isContinuousRunning = false;
+            if (!_passwordChangeDetected)
+            {
+                DashboardViewControl.ClearInfoMessage();
+            }
+            DashboardViewControl.SetStartEnabled(true);
+        }
+
+        private bool IsWithinWeeklyWindow(DateTime now)
+        {
+            // Allowed: Sunday >= 19:00, Monday-Thursday (all day), Friday < 20:00
+            if (now.DayOfWeek == DayOfWeek.Sunday)
+                return now.TimeOfDay >= TimeSpan.FromHours(19);
+            if (now.DayOfWeek == DayOfWeek.Monday || now.DayOfWeek == DayOfWeek.Tuesday || now.DayOfWeek == DayOfWeek.Wednesday || now.DayOfWeek == DayOfWeek.Thursday)
+                return true;
+            if (now.DayOfWeek == DayOfWeek.Friday)
+                return now.TimeOfDay < TimeSpan.FromHours(20);
+            return false; // Saturday
+        }
+
+        private bool IsInMaintenanceWindow(DateTime now)
+        {
+            // Daily maintenance from 00:15 to 03:15
+            var start = new TimeSpan(0, 15, 0);
+            var end = new TimeSpan(3, 15, 0);
+            return now.TimeOfDay >= start && now.TimeOfDay < end;
+        }
+
+        private DateTime GetNextAllowedStart(DateTime earliest)
+        {
+            DateTime dt = earliest;
+            while (true)
+            {
+                if (!IsWithinWeeklyWindow(dt))
+                {
+                    // Adjust to next weekly start
+                    if (dt.DayOfWeek == DayOfWeek.Friday && dt.TimeOfDay >= TimeSpan.FromHours(20))
+                    {
+                        // Jump to Sunday 19:00
+                        int daysUntilSunday = ((int)DayOfWeek.Sunday - (int)dt.DayOfWeek + 7) % 7;
+                        dt = dt.Date.AddDays(daysUntilSunday).AddHours(19);
+                        continue;
+                    }
+                    if (dt.DayOfWeek == DayOfWeek.Saturday)
+                    {
+                        // Next Sunday 19:00
+                        int daysUntilSunday = ((int)DayOfWeek.Sunday - (int)dt.DayOfWeek + 7) % 7;
+                        dt = dt.Date.AddDays(daysUntilSunday).AddHours(19);
+                        continue;
+                    }
+                    if (dt.DayOfWeek == DayOfWeek.Sunday && dt.TimeOfDay < TimeSpan.FromHours(19))
+                    {
+                        dt = dt.Date.AddHours(19);
+                        continue;
+                    }
+                }
+                if (IsInMaintenanceWindow(dt))
+                {
+                    dt = dt.Date.AddHours(3).AddMinutes(15);
+                    continue;
+                }
+                if (IsWithinWeeklyWindow(dt) && !IsInMaintenanceWindow(dt))
+                    return dt;
+                dt = dt.AddMinutes(1); // Fallback incremental advance
+            }
+        }
+
         private async void StartButton_Click(object? sender, RoutedEventArgs e)
         {
-            await ExecuteScreeningProcess();
+            if (_isContinuousRunning)
+                return; // Already running
+            _stopping = false;
+            _isContinuousRunning = true;
+            _passwordChangeDetected = false; // reset flag
+            DashboardViewControl.SetStartEnabled(false);
+            DashboardViewControl.ShowInfoMessage("Scheduled processing started.");
+            _cts = new CancellationTokenSource();
+            _continuousTask = RunContinuousProcessingAsync(_cts.Token); // fire & forget
         }
 
         private async Task DeleteAllRecords() 
@@ -189,6 +321,8 @@ namespace ScreeningLogicServiceApp
         {
             _stopping = true;
             DashboardViewControl.ShowWarningMessage("Attempting to stop process. Please wait...");
+            _cts?.Cancel();
+            _isContinuousRunning = false;
             await _configurationRepo.StopProcess();
         }
 
