@@ -31,7 +31,7 @@ namespace ScreeningLogicServiceApp
             var dashboard = DashboardViewControl; // named element from XAML
             if (dashboard?.NamesCombo != null)
             {
-                dashboard.NamesCombo.SelectedIndex = 2; // 0:1, 1:2, 2:5, 3:10, 4:25, 5:50
+                dashboard.NamesCombo.SelectedIndex = 6; // 0:1, 1:2, 2:5, 3:10, 4:25, 5:50, 6:All(50)
                 dashboard.StartClicked -= StartButton_Click; // avoid duplicate
                 dashboard.StopClicked -= StopButton_Click;
                 dashboard.StartClicked += StartButton_Click;
@@ -67,12 +67,26 @@ namespace ScreeningLogicServiceApp
                 }
 
                 // Determine parameter from UI (selected count) or set your own value
-                string param = "";
                 var selected = dashboard?.NamesCombo?.SelectedItem as ComboBoxItem;
-                if (selected?.Content is string s && !string.IsNullOrWhiteSpace(s))
-                    param = s; // e.g., "5"
+                int countToProcess = 50; // default fallback
+                if (selected != null)
+                {
+                    // Prefer Tag if provided (e.g., "All" item carries Tag="50")
+                    if (selected.Tag is string tagStr && int.TryParse(tagStr, out var tagVal))
+                    {
+                        countToProcess = tagVal;
+                    }
+                    else if (selected.Tag is int tagInt)
+                    {
+                        countToProcess = tagInt;
+                    }
+                    else if (selected.Content is string contentStr && int.TryParse(contentStr, out var contentVal))
+                    {
+                        countToProcess = contentVal;
+                    }
+                }
 
-                await _configurationRepo.UpdateMaxRecordsToProcessAsync(int.Parse(param));
+                await _configurationRepo.UpdateMaxRecordsToProcessAsync(countToProcess);
 
 
                 // *********** Start of Screening Logic WinForms app process ***********
