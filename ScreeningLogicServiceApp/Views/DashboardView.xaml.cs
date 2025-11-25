@@ -36,7 +36,7 @@ namespace ScreeningLogicServiceApp.Views
             SetActive(StoppedCard);
             SetInactive(ScreeningLogicCard);
             SetInactive(JusticeExchangeCard);
-            SetStartEnabled(true);
+            //SetStartEnabled(true);
             SetStopEnabled(false);
         }
 

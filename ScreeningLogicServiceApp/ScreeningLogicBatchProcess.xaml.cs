@@ -57,6 +57,7 @@ namespace ScreeningLogicServiceApp
         private async Task ExecuteScreeningProcess()
         {
             DashboardViewControl.ClearInfoMessage();
+            DashboardViewControl.HighlightScreeningLogicProcessing();
             DashboardViewControl.SetStopEnabled(true);
             AppCloseButton.IsEnabled = false;
             await _configurationRepo.UndoStop();
@@ -198,8 +199,9 @@ namespace ScreeningLogicServiceApp
             {
                 var now = DateTime.Now;
                 if (IsWithinWeeklyWindow(now) && !IsInMaintenanceWindow(now))
-                {
+                {                   
                     await ExecuteScreeningProcess();
+                    DashboardViewControl.ShowInfoMessage("Screening process completed. Waiting for next scheduled run.");
                 }
                 else
                 {
