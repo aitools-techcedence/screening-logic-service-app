@@ -134,7 +134,7 @@ namespace ScreeningLogicServiceApp
                 // *********** End of Screening Logic WinForms app process ***********
 
                 var processStartStop = await _configurationRepo.GetProcessStartAndStopAsync();
-                if (!processStartStop.Stop)
+                if (!processStartStop.Stop && _isContinuousRunning == true)
                 {
                     // *********** Start of Justice Exchange WinForms app process ***********
                     // Highlight JusticeExchangeCard while running JE process
