@@ -81,10 +81,10 @@ namespace ScreeningLogicServiceApp
 
                 // Determine parameter from UI (selected count) or set your own value
                 var selected = dashboard?.NamesCombo?.SelectedItem as ComboBoxItem;
-                int countToProcess = 50; // default fallback
+                int countToProcess = 100; // default fallback
                 if (selected != null)
                 {
-                    // Prefer Tag if provided (e.g., "All" item carries Tag="50")
+                    // Prefer Tag if provided (e.g., "All" item carries Tag="100")
                     if (selected.Tag is string tagStr && int.TryParse(tagStr, out var tagVal))
                     {
                         countToProcess = tagVal;
