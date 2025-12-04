@@ -216,8 +216,8 @@ namespace ScreeningLogicServiceApp
                     }
                 }
 
-                // Compute next allowed start (30 minutes after completion or current time if we skipped)
-                DateTime earliest = DateTime.Now.AddMinutes(30);
+                // Compute next allowed start (15 minutes after completion or current time if we skipped)
+                DateTime earliest = DateTime.Now.AddMinutes(15);
                 DateTime nextStart = GetNextAllowedStart(earliest);
                 TimeSpan delay = nextStart - DateTime.Now;
                 if (delay < TimeSpan.Zero)
@@ -255,8 +255,8 @@ namespace ScreeningLogicServiceApp
 
         private bool IsInMaintenanceWindow(DateTime now)
         {
-            // Daily maintenance from 00:15 to 03:15
-            var start = new TimeSpan(0, 15, 0);
+            // Daily maintenance from 00:00 to 03:15
+            var start = new TimeSpan(0, 00, 0);
             var end = new TimeSpan(3, 15, 0);
             return now.TimeOfDay >= start && now.TimeOfDay < end;
         }
