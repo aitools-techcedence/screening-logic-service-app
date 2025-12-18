@@ -201,7 +201,7 @@ namespace ScreeningLogicServiceApp
                 if (IsWithinWeeklyWindow(now) && !IsInMaintenanceWindow(now))
                 {                   
                     await ExecuteScreeningProcess();
-                    DashboardViewControl.ShowInfoMessage("Screening process completed. Waiting for next scheduled run.");
+                    DashboardViewControl.ShowInfoMessage("Screening process completed for current cycle. Next cycle will start shortly.");
                 }
                 else
                 {
@@ -216,8 +216,8 @@ namespace ScreeningLogicServiceApp
                     }
                 }
 
-                // Compute next allowed start (15 minutes after completion or current time if we skipped)
-                DateTime earliest = DateTime.Now.AddMinutes(15);
+                // Compute next allowed start (1 minute after completion or current time if we skipped)
+                DateTime earliest = DateTime.Now.AddMinutes(1);
                 DateTime nextStart = GetNextAllowedStart(earliest);
                 TimeSpan delay = nextStart - DateTime.Now;
                 if (delay < TimeSpan.Zero)
