@@ -22,6 +22,7 @@ namespace ScreeningLogicServiceApp
         private Task? _continuousTask;
         private bool _isContinuousRunning = false;
         private bool _passwordChangeDetected = false; // track to preserve message and stop loop
+        private bool _errorResponseDetected = false; // track if error response from JE detected
 
         public ScreeningLogicBatchProcess()
         {
@@ -63,6 +64,7 @@ namespace ScreeningLogicServiceApp
             await _configurationRepo.UndoStop();
             var dashboard = DashboardViewControl;
             bool passwordStop = false; // local flag for this execution
+            bool errorResponseStop = false; // local flag for this execution
             try
             {
                 // Check if JE password change is required; if yes, show message and stop continuous processing
@@ -78,6 +80,21 @@ namespace ScreeningLogicServiceApp
                     DashboardViewControl.SetStopEnabled(false);
                     return; // skip remaining processing
                 }
+
+                // Check if error response occurred in JE; if yes, show message and stop continuous processing
+                var errorResponse = await _configurationRepo.GetConfigurationValueAsync("ErrorResponseOccurred");
+                if (string.Equals(errorResponse, "Yes", StringComparison.OrdinalIgnoreCase))
+                {
+                    _errorResponseDetected = true;
+                    errorResponseStop = true; // reuse flag to preserve message
+                    DashboardViewControl.ShowInfoMessage("An error response was received from last processing attempt. Scheduled processing stopped.");
+                    _cts?.Cancel(); // cancel continuous loop
+                    _isContinuousRunning = false;
+                    dashboard?.SetStartEnabled(true);
+                    DashboardViewControl.SetStopEnabled(false);
+                    return; // skip remaining processing
+                }
+
 
                 // Determine parameter from UI (selected count) or set your own value
                 var selected = dashboard?.NamesCombo?.SelectedItem as ComboBoxItem;
@@ -183,7 +200,7 @@ namespace ScreeningLogicServiceApp
                     dashboard?.SetStartEnabled(true);
                 }
                 DashboardViewControl.SetStopEnabled(false);
-                if (!passwordStop) // preserve message if password triggered stop
+                if (!passwordStop || !errorResponseStop) // preserve message if password triggered stop or error response triggered stop
                 {
                     DashboardViewControl.ClearInfoMessage();
                 }
@@ -234,7 +251,7 @@ namespace ScreeningLogicServiceApp
             }
             // After loop finishes ensure Start button enabled
             _isContinuousRunning = false;
-            if (!_passwordChangeDetected)
+            if (!_passwordChangeDetected || !_errorResponseDetected)
             {
                 DashboardViewControl.ClearInfoMessage();
             }
@@ -307,6 +324,7 @@ namespace ScreeningLogicServiceApp
             _stopping = false;
             _isContinuousRunning = true;
             _passwordChangeDetected = false; // reset flag
+            _errorResponseDetected = false; // reset flag
             DashboardViewControl.SetStartEnabled(false);
             DashboardViewControl.ShowInfoMessage("Scheduled processing started.");
             _cts = new CancellationTokenSource();
