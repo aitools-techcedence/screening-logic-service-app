@@ -200,9 +200,10 @@ namespace ScreeningLogicServiceApp
                     dashboard?.SetStartEnabled(true);
                 }
                 DashboardViewControl.SetStopEnabled(false);
-                if (!passwordStop || !errorResponseStop) // preserve message if password triggered stop or error response triggered stop
+                
+                if (!passwordStop && !errorResponseStop) // only show completion message if not stopped for these reasons
                 {
-                    DashboardViewControl.ClearInfoMessage();
+                    DashboardViewControl.ShowInfoMessage("Screening process completed for current cycle. Next cycle will start shortly.");
                 }
                 // Delete all records from all tables except Configuration table and ProcessStartAndStop table
                 await DeleteAllRecords();
@@ -217,8 +218,7 @@ namespace ScreeningLogicServiceApp
                 var now = DateTime.Now;
                 if (IsWithinWeeklyWindow(now) && !IsInMaintenanceWindow(now))
                 {                   
-                    await ExecuteScreeningProcess();
-                    DashboardViewControl.ShowInfoMessage("Screening process completed for current cycle. Next cycle will start shortly.");
+                    await ExecuteScreeningProcess();                    
                 }
                 else
                 {
@@ -251,7 +251,7 @@ namespace ScreeningLogicServiceApp
             }
             // After loop finishes ensure Start button enabled
             _isContinuousRunning = false;
-            if (!_passwordChangeDetected || !_errorResponseDetected)
+            if (!_passwordChangeDetected && !_errorResponseDetected)
             {
                 DashboardViewControl.ClearInfoMessage();
             }
@@ -329,6 +329,20 @@ namespace ScreeningLogicServiceApp
             DashboardViewControl.ShowInfoMessage("Scheduled processing started.");
             _cts = new CancellationTokenSource();
             _continuousTask = RunContinuousProcessingAsync(_cts.Token); // fire & forget
+
+            ResetErrorResponseOccurredToFalse(); // reset error response flag in configuration at the start of processing
+        }
+
+        private async void ResetErrorResponseOccurredToFalse()
+        {
+            try
+            {
+                await _configurationRepo.SetConfigurationValueAsync("ErrorResponseOccurred", "No");
+            }
+            catch
+            {
+                // Intentionally ignore: failure to reset flag should not block starting processing.
+            }
         }
 
         private async Task DeleteAllRecords() 

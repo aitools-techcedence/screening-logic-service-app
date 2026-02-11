@@ -88,5 +88,28 @@ namespace ScreeningLogicServiceApp.Repository
             var config = await context.Configurations.AsNoTracking().FirstOrDefaultAsync(c => c.ConfigKey == configKey);
             return config?.ConfigValue;
         }
+
+        public async Task SetConfigurationValueAsync(string configKey, string value)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var config = await context.Configurations.FirstOrDefaultAsync(c => c.ConfigKey == configKey);
+            if (config == null)
+            {
+                config = new Configuration
+                {
+                    ConfigKey = configKey,
+                    ConfigValue = value,
+                    UserId = null
+                };
+                context.Configurations.Add(config);
+            }
+            else
+            {
+                config.ConfigValue = value;
+                context.Configurations.Update(config);
+            }
+
+            await context.SaveChangesAsync();
+        }
     }
 }
