@@ -58,7 +58,7 @@ namespace ScreeningLogicServiceApp
         private async Task ExecuteScreeningProcess()
         {
             DashboardViewControl.ClearInfoMessage();
-            DashboardViewControl.HighlightScreeningLogicProcessing();
+            DashboardViewControl.HighlightJusticeExchangeProcessing();
             DashboardViewControl.SetStopEnabled(true);
             AppCloseButton.IsEnabled = false;
             await _configurationRepo.UndoStop();
@@ -97,67 +97,31 @@ namespace ScreeningLogicServiceApp
 
 
                 // Determine parameter from UI (selected count) or set your own value
-                var selected = dashboard?.NamesCombo?.SelectedItem as ComboBoxItem;
-                int countToProcess = 100; // default fallback
-                if (selected != null)
-                {
-                    // Prefer Tag if provided (e.g., "All" item carries Tag="100")
-                    if (selected.Tag is string tagStr && int.TryParse(tagStr, out var tagVal))
-                    {
-                        countToProcess = tagVal;
-                    }
-                    else if (selected.Tag is int tagInt)
-                    {
-                        countToProcess = tagInt;
-                    }
-                    else if (selected.Content is string contentStr && int.TryParse(contentStr, out var contentVal))
-                    {
-                        countToProcess = contentVal;
-                    }
-                }
+                //var selected = dashboard?.NamesCombo?.SelectedItem as ComboBoxItem;
+                //int countToProcess = 100; // default fallback
+                //if (selected != null)
+                //{
+                //    // Prefer Tag if provided (e.g., "All" item carries Tag="100")
+                //    if (selected.Tag is string tagStr && int.TryParse(tagStr, out var tagVal))
+                //    {
+                //        countToProcess = tagVal;
+                //    }
+                //    else if (selected.Tag is int tagInt)
+                //    {
+                //        countToProcess = tagInt;
+                //    }
+                //    else if (selected.Content is string contentStr && int.TryParse(contentStr, out var contentVal))
+                //    {
+                //        countToProcess = contentVal;
+                //    }
+                //}
 
-                await _configurationRepo.UpdateMaxRecordsToProcessAsync(countToProcess);
-
-
-                // *********** Start of Screening Logic WinForms app process ***********
-                // Read full path to WinForms EXE from configuration
-                string? exePath = ConfigurationManager.AppSettings["ScreeningLogicWinFormsPath"];
-                if (string.IsNullOrWhiteSpace(exePath))
-                    throw new InvalidOperationException("Missing appSettings key 'ScreeningLogicWinFormsPath' in App.config.");
-
-                exePath = exePath.Trim();
-                if (!File.Exists(exePath))
-                    throw new FileNotFoundException($"WinForms app not found at configured path: {exePath}");
-
-                // Build arguments: WinForms expects "--hidden" as argument.
-                string args = "--hidden";
-
-                var psi = new ProcessStartInfo
-                {
-                    FileName = exePath,
-                    Arguments = args,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    WorkingDirectory = Path.GetDirectoryName(exePath) ?? AppDomain.CurrentDomain.BaseDirectory,
-                };
-
-                using (var process = Process.Start(psi))
-                {
-                    if (process == null)
-                        throw new InvalidOperationException("Failed to start external process.");
-
-                    // Await process exit; WinForms app calls this.Close() when done
-                    await process.WaitForExitAsync();
-                }
-                // *********** End of Screening Logic WinForms app process ***********
+                //await _configurationRepo.UpdateMaxRecordsToProcessAsync(100);
 
                 var processStartStop = await _configurationRepo.GetProcessStartAndStopAsync();
                 if (!processStartStop.Stop && _isContinuousRunning == true)
                 {
                     // *********** Start of Justice Exchange WinForms app process ***********
-                    // Highlight JusticeExchangeCard while running JE process
-                    dashboard?.HighlightJusticeExchangeProcessing();
-
                     string? jeExePath = ConfigurationManager.AppSettings["JusticeExchangeWinFormsPath"];
                     if (string.IsNullOrWhiteSpace(jeExePath))
                         throw new InvalidOperationException("Missing appSettings key 'JusticeExchangeWinFormsPath' in App.config.");
