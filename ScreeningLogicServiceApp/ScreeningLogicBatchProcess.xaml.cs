@@ -37,22 +37,25 @@ namespace ScreeningLogicServiceApp
             var dashboard = DashboardViewControl; // named element from XAML
             if (dashboard?.NamesCombo != null)
             {
-                dashboard.NamesCombo.SelectedIndex = 6; // 0:1, 1:2, 2:5, 3:10, 4:25, 5:50, 6:All(50)
+                dashboard.NamesCombo.SelectedIndex = 6; // 0:1, 1:2, 2:5, 3:10, 4:25, 5:50, 6:All(100)
                 dashboard.StartClicked -= StartButton_Click; // avoid duplicate
                 dashboard.StopClicked -= StopButton_Click;
                 dashboard.StartClicked += StartButton_Click;
                 dashboard.StopClicked += StopButton_Click;
             }
+                       
+            // On application load, delete all records from all tables except Configuration table and ProcessStartAndStop table
+            await DeleteAllRecords();
 
-            int inProcessCount = await _scrappingRepo.GetScreeningLogicScrappingInProgressInJusticeExchangeAsync();
-            if (inProcessCount > 1)
-            {
-                DashboardViewControl.ShowInfoMessage($"There are {inProcessCount} records awaiting to be processed in JusticeExchange. Click on start to continue processing.");
-            }
-            else if (inProcessCount == 1)
-            {
-                DashboardViewControl.ShowInfoMessage("There is 1 record awaiting to be processed in JusticeExchange. Click on start to continue processing.");
-            }
+            //int inProcessCount = await _scrappingRepo.GetScreeningLogicScrappingInProgressInJusticeExchangeAsync();
+            //if (inProcessCount > 1)
+            //{
+            //    DashboardViewControl.ShowInfoMessage($"There are {inProcessCount} records awaiting to be processed in JusticeExchange. Click on start to continue processing.");
+            //}
+            //else if (inProcessCount == 1)
+            //{
+            //    DashboardViewControl.ShowInfoMessage("There is 1 record awaiting to be processed in JusticeExchange. Click on start to continue processing.");
+            //}
         }
 
         private async Task ExecuteScreeningProcess()
