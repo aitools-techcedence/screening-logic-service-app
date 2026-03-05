@@ -85,18 +85,18 @@ namespace ScreeningLogicServiceApp
                 }
 
                 // Check if error response occurred in JE; if yes, show message and stop continuous processing
-                var errorResponse = await _configurationRepo.GetConfigurationValueAsync("ErrorResponseOccurred");
-                if (string.Equals(errorResponse, "Yes", StringComparison.OrdinalIgnoreCase))
-                {
-                    _errorResponseDetected = true;
-                    errorResponseStop = true; // reuse flag to preserve message
-                    DashboardViewControl.ShowInfoMessage("An error response was received from last processing attempt. Scheduled processing stopped.");
-                    _cts?.Cancel(); // cancel continuous loop
-                    _isContinuousRunning = false;
-                    dashboard?.SetStartEnabled(true);
-                    DashboardViewControl.SetStopEnabled(false);
-                    return; // skip remaining processing
-                }
+                //var errorResponse = await _configurationRepo.GetConfigurationValueAsync("ErrorResponseOccurred");
+                //if (string.Equals(errorResponse, "Yes", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    _errorResponseDetected = true;
+                //    errorResponseStop = true; // reuse flag to preserve message
+                //    DashboardViewControl.ShowInfoMessage("An error response was received from last processing attempt. Scheduled processing stopped.");
+                //    _cts?.Cancel(); // cancel continuous loop
+                //    _isContinuousRunning = false;
+                //    dashboard?.SetStartEnabled(true);
+                //    DashboardViewControl.SetStopEnabled(false);
+                //    return; // skip remaining processing
+                //}
 
 
                 // Determine parameter from UI (selected count) or set your own value
