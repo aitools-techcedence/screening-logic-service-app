@@ -1,0 +1,124 @@
+<UserControl x:Class="ScreeningLogicServiceApp.Views.ScheduleView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="900" d:DesignHeight="600">
+    <Grid Background="#E9F6FB" Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="40,20,40,10">
+            <TextBlock Text="Processing Schedule" FontSize="26" FontWeight="SemiBold" Foreground="#1B5B6A"/>
+            <TextBlock Text="Configure daily processing windows and maintenance timing." FontSize="18" Foreground="#1B5B6A"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" Margin="40,20,40,20" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" CanContentScroll="True">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="95"/>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="170"/>
+                    <ColumnDefinition Width="170"/>
+                </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Day" FontWeight="SemiBold" FontSize="18" Foreground="#1B5B6A" Margin="0,0,0,8"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="Turn Off" FontWeight="SemiBold" FontSize="18" Foreground="#1B5B6A" Margin="0,0,0,8"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="Start Time" FontWeight="SemiBold" FontSize="18" Foreground="#1B5B6A" Margin="0,0,0,8"/>
+            <TextBlock Grid.Row="0" Grid.Column="3" Text="Stop Time" FontWeight="SemiBold" FontSize="18" Foreground="#1B5B6A" Margin="0,0,0,8"/>
+                <TextBlock Grid.Row="0" Grid.Column="5" Text="Maintenance Start" FontWeight="SemiBold" FontSize="18" Foreground="#1B5B6A" Margin="8,0,0,8"/>
+                <TextBlock Grid.Row="0" Grid.Column="6" Text="Maintenance Stop" FontWeight="SemiBold" FontSize="18" Foreground="#1B5B6A" Margin="8,0,0,8"/>
+                <Border Grid.Row="0" Grid.RowSpan="8" Grid.Column="4" Width="1" Background="#8DA5B0" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Sunday" VerticalAlignment="Center" FontSize="18" Foreground="#1B5B6A"/>
+            <CheckBox x:Name="TurnOffSunday" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="8,0,0,0" Checked="TurnOff_CheckedChanged" Unchecked="TurnOff_CheckedChanged"/>
+            <ComboBox x:Name="StartSunday" Grid.Row="1" Grid.Column="2" Height="32" Margin="0,0,8,6"/>
+            <ComboBox x:Name="StopSunday" Grid.Row="1" Grid.Column="3" Height="32" Margin="0,0,8,6"/>
+                <ComboBox x:Name="MaintenanceStartSunday" Grid.Row="1" Grid.Column="5" Height="32" Margin="8,0,8,6"/>
+                <ComboBox x:Name="MaintenanceStopSunday" Grid.Row="1" Grid.Column="6" Height="32" Margin="8,0,8,6"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Monday" VerticalAlignment="Center" FontSize="18" Foreground="#1B5B6A"/>
+            <CheckBox x:Name="TurnOffMonday" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="8,0,0,0" Checked="TurnOff_CheckedChanged" Unchecked="TurnOff_CheckedChanged"/>
+            <ComboBox x:Name="StartMonday" Grid.Row="2" Grid.Column="2" Height="32" Margin="0,0,8,6"/>
+            <ComboBox x:Name="StopMonday" Grid.Row="2" Grid.Column="3" Height="32" Margin="0,0,8,6"/>
+                <ComboBox x:Name="MaintenanceStartMonday" Grid.Row="2" Grid.Column="5" Height="32" Margin="8,0,8,6"/>
+                <ComboBox x:Name="MaintenanceStopMonday" Grid.Row="2" Grid.Column="6" Height="32" Margin="8,0,8,6"/>
+
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Tuesday" VerticalAlignment="Center" FontSize="18" Foreground="#1B5B6A"/>
+            <CheckBox x:Name="TurnOffTuesday" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="8,0,0,0" Checked="TurnOff_CheckedChanged" Unchecked="TurnOff_CheckedChanged"/>
+            <ComboBox x:Name="StartTuesday" Grid.Row="3" Grid.Column="2" Height="32" Margin="0,0,8,6"/>
+            <ComboBox x:Name="StopTuesday" Grid.Row="3" Grid.Column="3" Height="32" Margin="0,0,8,6"/>
+                <ComboBox x:Name="MaintenanceStartTuesday" Grid.Row="3" Grid.Column="5" Height="32" Margin="8,0,8,6"/>
+                <ComboBox x:Name="MaintenanceStopTuesday" Grid.Row="3" Grid.Column="6" Height="32" Margin="8,0,8,6"/>
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Wednesday" VerticalAlignment="Center" FontSize="18" Foreground="#1B5B6A"/>
+            <CheckBox x:Name="TurnOffWednesday" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="8,0,0,0" Checked="TurnOff_CheckedChanged" Unchecked="TurnOff_CheckedChanged"/>
+            <ComboBox x:Name="StartWednesday" Grid.Row="4" Grid.Column="2" Height="32" Margin="0,0,8,6"/>
+            <ComboBox x:Name="StopWednesday" Grid.Row="4" Grid.Column="3" Height="32" Margin="0,0,8,6"/>
+                <ComboBox x:Name="MaintenanceStartWednesday" Grid.Row="4" Grid.Column="5" Height="32" Margin="8,0,8,6"/>
+                <ComboBox x:Name="MaintenanceStopWednesday" Grid.Row="4" Grid.Column="6" Height="32" Margin="8,0,8,6"/>
+
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="Thursday" VerticalAlignment="Center" FontSize="18" Foreground="#1B5B6A"/>
+            <CheckBox x:Name="TurnOffThursday" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="8,0,0,0" Checked="TurnOff_CheckedChanged" Unchecked="TurnOff_CheckedChanged"/>
+            <ComboBox x:Name="StartThursday" Grid.Row="5" Grid.Column="2" Height="32" Margin="0,0,8,6"/>
+            <ComboBox x:Name="StopThursday" Grid.Row="5" Grid.Column="3" Height="32" Margin="0,0,8,6"/>
+                <ComboBox x:Name="MaintenanceStartThursday" Grid.Row="5" Grid.Column="5" Height="32" Margin="8,0,8,6"/>
+                <ComboBox x:Name="MaintenanceStopThursday" Grid.Row="5" Grid.Column="6" Height="32" Margin="8,0,8,6"/>
+
+            <TextBlock Grid.Row="6" Grid.Column="0" Text="Friday" VerticalAlignment="Center" FontSize="18" Foreground="#1B5B6A"/>
+            <CheckBox x:Name="TurnOffFriday" Grid.Row="6" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="8,0,0,0" Checked="TurnOff_CheckedChanged" Unchecked="TurnOff_CheckedChanged"/>
+            <ComboBox x:Name="StartFriday" Grid.Row="6" Grid.Column="2" Height="32" Margin="0,0,8,6"/>
+            <ComboBox x:Name="StopFriday" Grid.Row="6" Grid.Column="3" Height="32" Margin="0,0,8,6"/>
+                <ComboBox x:Name="MaintenanceStartFriday" Grid.Row="6" Grid.Column="5" Height="32" Margin="8,0,8,6"/>
+                <ComboBox x:Name="MaintenanceStopFriday" Grid.Row="6" Grid.Column="6" Height="32" Margin="8,0,8,6"/>
+
+            <TextBlock Grid.Row="7" Grid.Column="0" Text="Saturday" VerticalAlignment="Center" FontSize="18" Foreground="#1B5B6A"/>
+            <CheckBox x:Name="TurnOffSaturday" Grid.Row="7" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="8,0,0,0" Checked="TurnOff_CheckedChanged" Unchecked="TurnOff_CheckedChanged"/>
+            <ComboBox x:Name="StartSaturday" Grid.Row="7" Grid.Column="2" Height="32" Margin="0,0,8,6"/>
+            <ComboBox x:Name="StopSaturday" Grid.Row="7" Grid.Column="3" Height="32" Margin="0,0,8,6"/>
+                <ComboBox x:Name="MaintenanceStartSaturday" Grid.Row="7" Grid.Column="5" Height="32" Margin="8,0,8,6"/>
+                <ComboBox x:Name="MaintenanceStopSaturday" Grid.Row="7" Grid.Column="6" Height="32" Margin="8,0,8,6"/>
+            </Grid>
+        </ScrollViewer>
+
+        <Grid Grid.Row="2" Margin="40,20,40,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock x:Name="ValidationMessageTextBlock"
+                       Grid.Column="0"
+                       VerticalAlignment="Center"
+                       Foreground="IndianRed"
+                       FontSize="16"
+                       TextWrapping="Wrap"/>
+
+            <Button Grid.Column="1"
+                    Content="Save"
+                    Width="260"
+                    Height="64"
+                    FontSize="22"
+                    HorizontalAlignment="Right"
+                    Style="{StaticResource UpdateButtonStyle}"
+                    Click="SaveButton_Click"/>
+        </Grid>
+    </Grid>
+</UserControl>
