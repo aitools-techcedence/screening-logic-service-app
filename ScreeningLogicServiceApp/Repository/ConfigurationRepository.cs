@@ -111,5 +111,44 @@ namespace ScreeningLogicServiceApp.Repository
 
             await context.SaveChangesAsync();
         }
+
+        public async Task<List<ProcessingSchedule>> GetProcessingScheduleAsync()
+        {
+            using var context = _contextFactory.CreateDbContext();
+            return await context.ProcessingSchedules
+                .AsNoTracking()
+                .OrderBy(x => x.DayOfWeek)
+                .ToListAsync();
+        }
+
+        public async Task SaveProcessingScheduleAsync(IEnumerable<ProcessingSchedule> schedules)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var now = DateTime.Now;
+
+            foreach (var schedule in schedules)
+            {
+                var existing = await context.ProcessingSchedules
+                    .FirstOrDefaultAsync(x => x.DayOfWeek == schedule.DayOfWeek);
+
+                if (existing == null)
+                {
+                    schedule.CreatedOn = now;
+                    schedule.UpdatedOn = now;
+                    context.ProcessingSchedules.Add(schedule);
+                }
+                else
+                {
+                    existing.IsTurnedOff = schedule.IsTurnedOff;
+                    existing.StartTime = schedule.StartTime;
+                    existing.StopTime = schedule.StopTime;
+                    existing.MaintenanceStartTime = schedule.MaintenanceStartTime;
+                    existing.MaintenanceStopTime = schedule.MaintenanceStopTime;
+                    existing.UpdatedOn = now;
+                }
+            }
+
+            await context.SaveChangesAsync();
+        }
     }
 }

@@ -25,6 +25,8 @@ public partial class ScreeningLogicAutomationContext : DbContext
 
     public virtual DbSet<PersonSummary> PersonSummaries { get; set; }
 
+    public virtual DbSet<ProcessingSchedule> ProcessingSchedules { get; set; }
+
     public virtual DbSet<ProcessStartAndStop> ProcessStartAndStops { get; set; }
 
     public virtual DbSet<ScreeningLogicBatch> ScreeningLogicBatches { get; set; }
@@ -162,6 +164,20 @@ public partial class ScreeningLogicAutomationContext : DbContext
                 .HasForeignKey(d => d.JusticeLogicPersonSummaryLinkId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PersonSummary_JusticeLogicPersonSummaryLinks");
+        });
+
+        modelBuilder.Entity<ProcessingSchedule>(entity =>
+        {
+            entity.ToTable("ProcessingSchedule");
+
+            entity.HasIndex(e => e.DayOfWeek, "UQ_ProcessingSchedule_DayOfWeek").IsUnique();
+
+            entity.Property(e => e.CreatedOn).HasColumnType("datetime2(0)");
+            entity.Property(e => e.MaintenanceStartTime).HasColumnType("time(0)");
+            entity.Property(e => e.MaintenanceStopTime).HasColumnType("time(0)");
+            entity.Property(e => e.StartTime).HasColumnType("time(0)");
+            entity.Property(e => e.StopTime).HasColumnType("time(0)");
+            entity.Property(e => e.UpdatedOn).HasColumnType("datetime2(0)");
         });
 
         modelBuilder.Entity<ProcessStartAndStop>(entity =>

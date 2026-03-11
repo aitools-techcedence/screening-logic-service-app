@@ -12,5 +12,7 @@ namespace ScreeningLogicServiceApp.Repository
         Task SaveBehaviourAsync(string value);
         Task<string?> GetConfigurationValueAsync(string configKey);
         Task SetConfigurationValueAsync(string configKey, string value);
+        Task<List<ProcessingSchedule>> GetProcessingScheduleAsync();
+        Task SaveProcessingScheduleAsync(IEnumerable<ProcessingSchedule> schedules);
     }
 }
