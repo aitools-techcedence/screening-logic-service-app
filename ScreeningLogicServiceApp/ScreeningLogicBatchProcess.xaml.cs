@@ -162,11 +162,15 @@ namespace ScreeningLogicServiceApp
                 AppCloseButton.IsEnabled = true;
                 // After completion, return highlight to Stopped and conditionally re-enable Start button
                 dashboard?.HighlightStopped();
-                if (!_isContinuousRunning)
+                if (_isContinuousRunning)
+                {
+                    DashboardViewControl.SetStopEnabled(true);
+                }
+                else
                 {
                     dashboard?.SetStartEnabled(true);
                 }
-                DashboardViewControl.SetStopEnabled(false);
+                
                 
                 if (!passwordStop && !errorResponseStop) // only show completion message if not stopped for these reasons
                 {
@@ -180,6 +184,7 @@ namespace ScreeningLogicServiceApp
         // Continuous scheduling logic
         private async Task RunContinuousProcessingAsync(CancellationToken token)
         {
+            DashboardViewControl.SetStopEnabled(true);
             while (!token.IsCancellationRequested)
             {
                 var now = DateTime.Now;
@@ -188,7 +193,7 @@ namespace ScreeningLogicServiceApp
                     await ExecuteScreeningProcess();                    
                 }
                 else
-                {
+                {                    
                     // Show waiting message if outside window
                     if (IsInMaintenanceWindow(now))
                     {
@@ -222,7 +227,7 @@ namespace ScreeningLogicServiceApp
             {
                 DashboardViewControl.ClearInfoMessage();
             }
-            DashboardViewControl.SetStartEnabled(true);
+            DashboardViewControl.SetStartEnabled(true);            
         }
 
         private bool IsWithinWeeklyWindow(DateTime now)
@@ -325,6 +330,7 @@ namespace ScreeningLogicServiceApp
             _cts?.Cancel();
             _isContinuousRunning = false;
             await _configurationRepo.StopProcess();
+            DashboardViewControl.SetStopEnabled(false);
         }
 
         private void AppCloseButton_Click(object sender, RoutedEventArgs e)

@@ -166,6 +166,23 @@ namespace ScreeningLogicServiceApp.Views
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                var processState = await _configurationRepository.GetProcessStartAndStopAsync();
+                if (processState != null && !processState.Stop)
+                {
+                    ValidationMessageTextBlock.Foreground = Brushes.IndianRed;
+                    ValidationMessageTextBlock.Text = "Schedule can be modified only when process has been stopped.";
+                    return;
+                }
+            }
+            catch
+            {
+                ValidationMessageTextBlock.Foreground = Brushes.IndianRed;
+                ValidationMessageTextBlock.Text = "Unable to validate processing status.";
+                return;
+            }
+
             var allValid = true;
             var missingStartStop = false;
             var invalidStartStopRange = false;
