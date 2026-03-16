@@ -20,7 +20,6 @@ namespace ScreeningLogicServiceApp.Views
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
             SetStartEnabled(false);
-            HighlightJusticeExchangeProcessing();
             ClearInfoMessage();
             StartClicked?.Invoke(this, e);
         }

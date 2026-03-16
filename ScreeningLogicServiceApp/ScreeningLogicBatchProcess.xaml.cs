@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using ScreeningLogicServiceApp.Models;
 using ScreeningLogicServiceApp.Repository;
 using System.Configuration;
 using System.Diagnostics;
@@ -185,29 +186,36 @@ namespace ScreeningLogicServiceApp
         private async Task RunContinuousProcessingAsync(CancellationToken token)
         {
             DashboardViewControl.SetStopEnabled(true);
+
             while (!token.IsCancellationRequested)
             {
                 var now = DateTime.Now;
-                if (IsWithinWeeklyWindow(now) && !IsInMaintenanceWindow(now))
+                var scheduleMap = await GetProcessingScheduleMapAsync();
+
+                if (!HasAnyActiveSchedule(scheduleMap))
                 {                   
-                    await ExecuteScreeningProcess();                    
+                    DashboardViewControl.ShowInfoMessage("No active schedule configured.");
+                }
+                else if (ShouldRunNow(now, scheduleMap))
+                {
+                    await ExecuteScreeningProcess();
                 }
                 else
                 {                    
-                    // Show waiting message if outside window
-                    if (IsInMaintenanceWindow(now))
+                    // Show waiting message based on configured schedule
+                    if (IsInConfiguredMaintenanceWindow(now, scheduleMap))
                     {
-                        DashboardViewControl.ShowInfoMessage("Maintenance window active. Waiting until 3:15 AM to resume.");
+                        DashboardViewControl.ShowInfoMessage("Maintenance window active.");
                     }
-                    else if (!IsWithinWeeklyWindow(now))
+                    else
                     {
-                        DashboardViewControl.ShowInfoMessage("Outside allowed weekly window. Waiting for Sunday 7 PM or until Friday 8 PM.");
+                        DashboardViewControl.ShowInfoMessage("Outside configured schedule window.");
                     }
                 }
 
                 // Compute next allowed start (1 minute after completion or current time if we skipped)
                 DateTime earliest = DateTime.Now.AddMinutes(1);
-                DateTime nextStart = GetNextAllowedStart(earliest);
+                DateTime nextStart = GetNextAllowedStart(earliest, scheduleMap);
                 TimeSpan delay = nextStart - DateTime.Now;
                 if (delay < TimeSpan.Zero)
                     delay = TimeSpan.Zero;
@@ -230,63 +238,98 @@ namespace ScreeningLogicServiceApp
             DashboardViewControl.SetStartEnabled(true);            
         }
 
-        private bool IsWithinWeeklyWindow(DateTime now)
+        private async Task<Dictionary<DayOfWeek, ProcessingSchedule>> GetProcessingScheduleMapAsync()
         {
-            // Allowed: Sunday >= 19:00, Monday-Thursday (all day), Friday < 20:00
-            if (now.DayOfWeek == DayOfWeek.Sunday)
-                return now.TimeOfDay >= TimeSpan.FromHours(19);
-            if (now.DayOfWeek == DayOfWeek.Monday || now.DayOfWeek == DayOfWeek.Tuesday || now.DayOfWeek == DayOfWeek.Wednesday || now.DayOfWeek == DayOfWeek.Thursday)
-                return true;
-            if (now.DayOfWeek == DayOfWeek.Friday)
-                return now.TimeOfDay < TimeSpan.FromHours(20);
-            return false; // Saturday
-        }
+            var schedules = await _configurationRepo.GetProcessingScheduleAsync();
+            var map = new Dictionary<DayOfWeek, ProcessingSchedule>();
 
-        private bool IsInMaintenanceWindow(DateTime now)
-        {
-            // Daily maintenance from 00:00 to 03:15
-            var start = new TimeSpan(0, 00, 0);
-            var end = new TimeSpan(3, 15, 0);
-            return now.TimeOfDay >= start && now.TimeOfDay < end;
-        }
-
-        private DateTime GetNextAllowedStart(DateTime earliest)
-        {
-            DateTime dt = earliest;
-            while (true)
+            foreach (var schedule in schedules)
             {
-                if (!IsWithinWeeklyWindow(dt))
-                {
-                    // Adjust to next weekly start
-                    if (dt.DayOfWeek == DayOfWeek.Friday && dt.TimeOfDay >= TimeSpan.FromHours(20))
-                    {
-                        // Jump to Sunday 19:00
-                        int daysUntilSunday = ((int)DayOfWeek.Sunday - (int)dt.DayOfWeek + 7) % 7;
-                        dt = dt.Date.AddDays(daysUntilSunday).AddHours(19);
-                        continue;
-                    }
-                    if (dt.DayOfWeek == DayOfWeek.Saturday)
-                    {
-                        // Next Sunday 19:00
-                        int daysUntilSunday = ((int)DayOfWeek.Sunday - (int)dt.DayOfWeek + 7) % 7;
-                        dt = dt.Date.AddDays(daysUntilSunday).AddHours(19);
-                        continue;
-                    }
-                    if (dt.DayOfWeek == DayOfWeek.Sunday && dt.TimeOfDay < TimeSpan.FromHours(19))
-                    {
-                        dt = dt.Date.AddHours(19);
-                        continue;
-                    }
-                }
-                if (IsInMaintenanceWindow(dt))
-                {
-                    dt = dt.Date.AddHours(3).AddMinutes(15);
-                    continue;
-                }
-                if (IsWithinWeeklyWindow(dt) && !IsInMaintenanceWindow(dt))
-                    return dt;
-                dt = dt.AddMinutes(1); // Fallback incremental advance
+                var day = (DayOfWeek)schedule.DayOfWeek;
+                map[day] = schedule;
             }
+
+            return map;
+        }
+
+        private static bool HasAnyActiveSchedule(IReadOnlyDictionary<DayOfWeek, ProcessingSchedule> scheduleMap)
+        {
+            foreach (var schedule in scheduleMap.Values)
+            {
+                if (!schedule.IsTurnedOff && schedule.StartTime.HasValue && schedule.StopTime.HasValue && schedule.StartTime.Value < schedule.StopTime.Value)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool ShouldRunNow(DateTime now, IReadOnlyDictionary<DayOfWeek, ProcessingSchedule> scheduleMap)
+        {
+            if (!scheduleMap.TryGetValue(now.DayOfWeek, out var schedule))
+            {
+                return false;
+            }
+
+            if (schedule.IsTurnedOff || !schedule.StartTime.HasValue || !schedule.StopTime.HasValue)
+            {
+                return false;
+            }
+
+            var time = now.TimeOfDay;
+            var withinRunWindow = time >= schedule.StartTime.Value && time < schedule.StopTime.Value;
+            if (!withinRunWindow)
+            {
+                return false;
+            }
+
+            if (schedule.MaintenanceStartTime.HasValue && schedule.MaintenanceStopTime.HasValue)
+            {
+                var inMaintenance = time >= schedule.MaintenanceStartTime.Value && time < schedule.MaintenanceStopTime.Value;
+                if (inMaintenance)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool IsInConfiguredMaintenanceWindow(DateTime now, IReadOnlyDictionary<DayOfWeek, ProcessingSchedule> scheduleMap)
+        {
+            if (!scheduleMap.TryGetValue(now.DayOfWeek, out var schedule))
+            {
+                return false;
+            }
+
+            if (!schedule.MaintenanceStartTime.HasValue || !schedule.MaintenanceStopTime.HasValue)
+            {
+                return false;
+            }
+
+            var time = now.TimeOfDay;
+            return time >= schedule.MaintenanceStartTime.Value && time < schedule.MaintenanceStopTime.Value;
+        }
+                
+        private DateTime GetNextAllowedStart(DateTime earliest, IReadOnlyDictionary<DayOfWeek, ProcessingSchedule> scheduleMap)
+        {
+            if (!HasAnyActiveSchedule(scheduleMap))
+            {
+                return earliest;
+            }
+
+            DateTime dt = earliest;
+            // Search up to 8 days ahead for next runnable minute based on configured schedule
+            for (int i = 0; i < 60 * 24 * 8; i++)
+            {
+                if (ShouldRunNow(dt, scheduleMap))
+                    return dt;
+
+                dt = dt.AddMinutes(1);
+            }
+
+            return earliest;
         }
 
         private async void StartButton_Click(object? sender, RoutedEventArgs e)
