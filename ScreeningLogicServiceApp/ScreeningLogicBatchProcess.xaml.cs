@@ -196,6 +196,26 @@ namespace ScreeningLogicServiceApp
                 {                   
                     DashboardViewControl.ShowInfoMessage("No active schedule configured.");
                 }
+                else if (ShouldRunNow(now, scheduleMap) && WillEnterMaintenanceWithin(now, TimeSpan.FromMinutes(45), scheduleMap))
+                {
+                    DashboardViewControl.ShowInfoMessage("The scheduled process will continue running after the Maintenance Window.");
+
+                    DateTime maintenanceEnd = GetMaintenanceEndForDay(now, scheduleMap);
+                    TimeSpan maintenanceDelay = maintenanceEnd - DateTime.Now;
+                    if (maintenanceDelay < TimeSpan.Zero)
+                        maintenanceDelay = TimeSpan.Zero;
+
+                    try
+                    {
+                        await Task.Delay(maintenanceDelay, token);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        break;
+                    }
+
+                    continue;
+                }
                 else if (ShouldRunNow(now, scheduleMap))
                 {
                     await ExecuteScreeningProcess();
@@ -205,7 +225,7 @@ namespace ScreeningLogicServiceApp
                     // Show waiting message based on configured schedule
                     if (IsInConfiguredMaintenanceWindow(now, scheduleMap))
                     {
-                        DashboardViewControl.ShowInfoMessage("Maintenance window active.");
+                        DashboardViewControl.ShowInfoMessage("The scheduled process will continue running after the Maintenance Window.");
                     }
                     else
                     {
@@ -311,6 +331,24 @@ namespace ScreeningLogicServiceApp
             var time = now.TimeOfDay;
             return time >= schedule.MaintenanceStartTime.Value && time < schedule.MaintenanceStopTime.Value;
         }
+
+        private static bool WillEnterMaintenanceWithin(DateTime now, TimeSpan lookAhead, IReadOnlyDictionary<DayOfWeek, ProcessingSchedule> scheduleMap)
+        {
+            if (!scheduleMap.TryGetValue(now.DayOfWeek, out var schedule))
+            {
+                return false;
+            }
+
+            if (!schedule.MaintenanceStartTime.HasValue || !schedule.MaintenanceStopTime.HasValue)
+            {
+                return false;
+            }
+
+            var current = now.TimeOfDay;
+            var maintenanceStart = schedule.MaintenanceStartTime.Value;
+
+            return current < maintenanceStart && maintenanceStart <= current.Add(lookAhead);
+        }
                 
         private DateTime GetNextAllowedStart(DateTime earliest, IReadOnlyDictionary<DayOfWeek, ProcessingSchedule> scheduleMap)
         {
@@ -330,6 +368,21 @@ namespace ScreeningLogicServiceApp
             }
 
             return earliest;
+        }
+
+        private DateTime GetMaintenanceEndForDay(DateTime now, IReadOnlyDictionary<DayOfWeek, ProcessingSchedule> scheduleMap)
+        {
+            if (!scheduleMap.TryGetValue(now.DayOfWeek, out var schedule))
+            {
+                return now;
+            }
+
+            if (!schedule.MaintenanceStopTime.HasValue)
+            {
+                return now;
+            }
+
+            return now.Date.Add(schedule.MaintenanceStopTime.Value);
         }
 
         private async void StartButton_Click(object? sender, RoutedEventArgs e)
