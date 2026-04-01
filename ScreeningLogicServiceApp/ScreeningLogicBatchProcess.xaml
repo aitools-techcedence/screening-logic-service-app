@@ -36,10 +36,6 @@
             <TabItem Header="Schedule">
                 <views:ScheduleView/>
             </TabItem>
-
-            <TabItem Header="Notifications">
-                <views:NotificationsView/>
-            </TabItem>
         </TabControl>
 
         <!-- Application Close button outside the TabControl -->
