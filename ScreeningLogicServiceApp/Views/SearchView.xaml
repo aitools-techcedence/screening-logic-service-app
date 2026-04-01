@@ -1,0 +1,121 @@
+<UserControl x:Class="ScreeningLogicServiceApp.Views.SearchView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="1000" d:DesignHeight="600">
+    <Grid Background="#E9F6FB" Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="20,10,20,0">
+            <TextBlock Text="Orders Processed" FontSize="32" FontWeight="SemiBold" Foreground="#1B5B6A"/>
+            <TextBlock Text="30 days old or newer orders only" FontSize="16" Foreground="#1B5B6A"/>
+        </StackPanel>
+
+        <Border Grid.Row="1" Margin="20,16,20,10" BorderBrush="#6FA8C4" BorderThickness="0,0,0,2" Padding="0,0,0,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="190"/>
+                    <ColumnDefinition Width="190"/>
+                    <ColumnDefinition Width="190"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Order#" FontSize="22" Foreground="#1B5B6A" Margin="0,0,10,8"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="Last Name" FontSize="22" Foreground="#1B5B6A" Margin="0,0,10,8"/>
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="First Name" FontSize="22" Foreground="#1B5B6A" Margin="0,0,10,8"/>
+                <TextBlock Grid.Row="0" Grid.Column="3" Text="DOB" FontSize="22" Foreground="#1B5B6A" Margin="0,0,10,8"/>
+
+                <TextBox x:Name="OrderNumberTextBox" Grid.Row="1" Grid.Column="0" Height="36" Margin="0,0,10,0" FontSize="18" Padding="8,4"/>
+                <TextBox x:Name="LastNameTextBox" Grid.Row="1" Grid.Column="1" Height="36" Margin="0,0,10,0" FontSize="18" Padding="8,4"/>
+                <TextBox x:Name="FirstNameTextBox" Grid.Row="1" Grid.Column="2" Height="36" Margin="0,0,10,0" FontSize="18" Padding="8,4"/>
+                <TextBox x:Name="DobTextBox"
+                         Grid.Row="1"
+                         Grid.Column="3"
+                         Height="36"
+                         Margin="0,0,10,0"
+                         FontSize="18"
+                         Padding="8,4"
+                         MaxLength="10"
+                         PreviewTextInput="DobTextBox_PreviewTextInput"
+                         TextChanged="DobTextBox_TextChanged"
+                         DataObject.Pasting="DobTextBox_Pasting"/>
+
+                <Button Grid.Row="1"
+                        Grid.Column="4"
+                        Content="Search"
+                        Width="90"
+                        Height="36"
+                        FontSize="18"
+                        Style="{StaticResource UpdateButtonStyle}"
+                        Click="SearchButton_Click"/>
+
+                <TextBlock x:Name="SearchMessageTextBlock"
+                           Grid.Row="2"
+                           Grid.Column="0"
+                           Grid.ColumnSpan="5"
+                           Margin="0,10,0,0"
+                           FontSize="15"
+                           Foreground="IndianRed"
+                           TextWrapping="Wrap"/>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="2" Margin="20,0,20,10" BorderBrush="#B7CCD6" BorderThickness="1" Background="#DCECF2">
+            <DataGrid x:Name="SearchResultsGrid"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      IsReadOnly="True"
+                      HeadersVisibility="Column"
+                      GridLinesVisibility="Horizontal"
+                      RowHeaderWidth="0"
+                      FontSize="16"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Order#" Binding="{Binding OrderNumber}" Width="140"/>
+                    <DataGridTextColumn Header="Last Name" Binding="{Binding NameLast}" Width="140"/>
+                    <DataGridTextColumn Header="First Name" Binding="{Binding NameFirst}" Width="140"/>
+                    <DataGridTextColumn Header="DOB" Binding="{Binding DobDisplay}" Width="120"/>
+                    <DataGridTextColumn Header="SSN" Binding="{Binding Ssn}" Width="120"/>
+                    <DataGridTextColumn Header="Req. On" Binding="{Binding ReceivedAt, StringFormat=MM/dd/yyyy HH:mm}" Width="150"/>
+                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120"/>
+                    <DataGridTemplateColumn Header="" Width="80">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Show"
+                                        Width="62"
+                                        Height="28"
+                                        FontSize="14"
+                                        Click="ShowErrorButton_Click">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource UpdateButtonStyle}">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding CanShowErrorDetails}" Value="False">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+    </Grid>
+</UserControl>

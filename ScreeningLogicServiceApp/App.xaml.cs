@@ -24,11 +24,14 @@ namespace ScreeningLogicServiceApp
             // Read connection string from App.config and provide it via IConfiguration
             var defaultCs = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"]?.ConnectionString
                              ?? throw new InvalidOperationException("Missing connection string 'DefaultConnection' in App.config.");
+            var integrationCs = System.Configuration.ConfigurationManager.ConnectionStrings["IntegrationDB"]?.ConnectionString
+                                ?? throw new InvalidOperationException("Missing connection string 'IntegrationDB' in App.config.");
 
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(new[]
                 {
-                    new KeyValuePair<string, string?>("ConnectionStrings:DefaultConnection", defaultCs)
+                    new KeyValuePair<string, string?>("ConnectionStrings:DefaultConnection", defaultCs),
+                    new KeyValuePair<string, string?>("ConnectionStrings:IntegrationDB", integrationCs)
                 })
                 .Build();
 
@@ -42,6 +45,7 @@ namespace ScreeningLogicServiceApp
             services.AddScoped<IPasswordRepository, PasswordRepository>();
             services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
             services.AddScoped<IScreeningLogicScrappingRepository, ScreeningLogicScrappingRepository>();
+            services.AddScoped<IIncomingOrderSearchRepository, IncomingOrderSearchRepository>();
 
             Services = services.BuildServiceProvider();
         }

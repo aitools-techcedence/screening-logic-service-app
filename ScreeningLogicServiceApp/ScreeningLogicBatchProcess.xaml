@@ -36,6 +36,10 @@
             <TabItem Header="Schedule">
                 <views:ScheduleView/>
             </TabItem>
+
+            <TabItem Header="Search">
+                <views:SearchView/>
+            </TabItem>
         </TabControl>
 
         <!-- Application Close button outside the TabControl -->
