@@ -26,6 +26,54 @@ public sealed class IncomingOrderSearchRepository : IIncomingOrderSearchReposito
         }
     }
 
+    public async Task<IncomingOrderDashboardMetrics> GetDashboardMetricsAsync()
+    {
+        var sql = $@"
+SELECT
+    COUNT(1) AS ApplicationProcessedCount,
+    MIN(UpdatedAt) AS Since,
+    CAST(
+        CASE
+            WHEN COUNT(1) = 0 THEN 0
+            ELSE (SUM(CASE WHEN UPPER(LTRIM(RTRIM(ISNULL(ReportResult, '')))) = 'HIT' THEN 1 ELSE 0 END) * 100.0 / COUNT(1))
+        END
+    AS decimal(5,2)) AS HitRatioPercent,
+    AVG(CAST(CASE
+        WHEN UpdatedAt IS NOT NULL AND COALESCE(StartProcess, ReceivedAt) IS NOT NULL
+            THEN DATEDIFF_BIG(MILLISECOND, COALESCE(StartProcess, ReceivedAt), UpdatedAt)
+        ELSE NULL
+    END AS float)) AS AverageProcessTimeMs,
+    AVG(CAST(CASE
+        WHEN UpdatedAt IS NOT NULL AND ReceivedAt IS NOT NULL
+            THEN DATEDIFF_BIG(MILLISECOND, ReceivedAt, UpdatedAt)
+        ELSE NULL
+    END AS float)) AS AverageTurnaroundMs
+FROM {_tableName}
+WHERE UPPER(LTRIM(RTRIM(ISNULL(Status, '')))) = 'COMPLETED';";
+
+        await using var connection = new SqlConnection(_connectionString);
+        await connection.OpenAsync();
+
+        await using var command = new SqlCommand(sql, connection);
+        await using var reader = await command.ExecuteReaderAsync();
+
+        if (!await reader.ReadAsync())
+        {
+            return new IncomingOrderDashboardMetrics();
+        }
+
+        return new IncomingOrderDashboardMetrics
+        {
+            ApplicationProcessedCount = reader.GetInt32(reader.GetOrdinal("ApplicationProcessedCount")),
+            Since = GetDateTime(reader, "Since"),
+            HitRatioPercent = reader.IsDBNull(reader.GetOrdinal("HitRatioPercent"))
+                ? 0m
+                : reader.GetDecimal(reader.GetOrdinal("HitRatioPercent")),
+            AverageProcessTime = GetDurationFromMilliseconds(reader, "AverageProcessTimeMs"),
+            AverageTurnaround = GetDurationFromMilliseconds(reader, "AverageTurnaroundMs")
+        };
+    }
+
     public async Task<IReadOnlyList<IncomingOrderSearchResult>> SearchIncomingOrdersAsync(
         string? orderNumber,
         string? lastName,
@@ -114,5 +162,17 @@ WHERE 1 = 1");
     {
         var ordinal = reader.GetOrdinal(columnName);
         return reader.IsDBNull(ordinal) ? null : reader.GetDateTime(ordinal);
+    }
+
+    private static TimeSpan? GetDurationFromMilliseconds(SqlDataReader reader, string columnName)
+    {
+        var ordinal = reader.GetOrdinal(columnName);
+        if (reader.IsDBNull(ordinal))
+        {
+            return null;
+        }
+
+        var milliseconds = reader.GetDouble(ordinal);
+        return TimeSpan.FromMilliseconds(milliseconds);
     }
 }

@@ -18,6 +18,7 @@ namespace ScreeningLogicServiceApp
     {
         private readonly IConfigurationRepository _configurationRepo;
         private readonly IScreeningLogicScrappingRepository _scrappingRepo;
+        private readonly IIncomingOrderSearchRepository _incomingOrderSearchRepository;
         private bool _stopping = false;
         private CancellationTokenSource? _cts;
         private Task? _continuousTask;
@@ -31,6 +32,7 @@ namespace ScreeningLogicServiceApp
             Loaded += OnLoaded;
             _configurationRepo = App.Services.GetRequiredService<IConfigurationRepository>();
             _scrappingRepo = App.Services.GetRequiredService<IScreeningLogicScrappingRepository>();
+            _incomingOrderSearchRepository = App.Services.GetRequiredService<IIncomingOrderSearchRepository>();
         }
 
         private async void OnLoaded(object sender, RoutedEventArgs e)
@@ -47,6 +49,7 @@ namespace ScreeningLogicServiceApp
                        
             // On application load, delete all records from all tables except Configuration table and ProcessStartAndStop table
             await DeleteAllRecords();
+            await RefreshDashboardMetricsAsync();
 
             //int inProcessCount = await _scrappingRepo.GetScreeningLogicScrappingInProgressInJusticeExchangeAsync();
             //if (inProcessCount > 1)
@@ -179,6 +182,20 @@ namespace ScreeningLogicServiceApp
                 }
                 // Delete all records from all tables except Configuration table and ProcessStartAndStop table
                 await DeleteAllRecords();
+                await RefreshDashboardMetricsAsync();
+            }
+        }
+
+        private async Task RefreshDashboardMetricsAsync()
+        {
+            try
+            {
+                var metrics = await _incomingOrderSearchRepository.GetDashboardMetricsAsync();
+                DashboardViewControl.SetDashboardMetrics(metrics);
+            }
+            catch
+            {
+                DashboardViewControl.ShowWarningMessage("Unable to load dashboard metrics.");
             }
         }
 
@@ -208,6 +225,7 @@ namespace ScreeningLogicServiceApp
                     try
                     {
                         await Task.Delay(maintenanceDelay, token);
+                        await RefreshDashboardMetricsAsync();
                     }
                     catch (TaskCanceledException)
                     {
@@ -243,6 +261,7 @@ namespace ScreeningLogicServiceApp
                 try
                 {
                     await Task.Delay(delay, token);
+                    await RefreshDashboardMetricsAsync();
                 }
                 catch (TaskCanceledException)
                 {

@@ -11,6 +11,7 @@
             <RowDefinition Height="30"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -34,11 +35,50 @@
             </ComboBox>
         </StackPanel>
 
+        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="40,0,40,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="220"/>
+                <ColumnDefinition Width="140"/>
+                <ColumnDefinition Width="190"/>
+                <ColumnDefinition Width="140"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Application has processed" FontSize="18" Foreground="#1B5B6A" VerticalAlignment="Center"/>
+                <Border Background="White" BorderBrush="#9DB9C2" BorderThickness="1" CornerRadius="2" Margin="8,0,8,0" Padding="8,2">
+                    <TextBlock x:Name="ApplicationProcessedValueText" FontSize="18" Foreground="#1B5B6A" VerticalAlignment="Center" MinWidth="60" TextAlignment="Center"/>
+                </Border>
+                <TextBlock Text="since" FontSize="18" Foreground="#1B5B6A" VerticalAlignment="Center"/>
+                <Border Background="White" BorderBrush="#9DB9C2" BorderThickness="1" CornerRadius="2" Margin="8,0,0,0" Padding="8,2">
+                    <TextBlock x:Name="SinceValueText" FontSize="18" Foreground="#1B5B6A" VerticalAlignment="Center" MinWidth="170"/>
+                </Border>
+            </StackPanel>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Average turnaround" FontSize="18" Foreground="#1B5B6A" Margin="0,10,0,0" VerticalAlignment="Center"/>
+            <Border Grid.Row="1" Grid.Column="1" Background="White" BorderBrush="#9DB9C2" BorderThickness="1" CornerRadius="2" Margin="0,10,0,0" Padding="8,2" VerticalAlignment="Center">
+                <TextBlock x:Name="AverageTurnaroundValueText" FontSize="18" Foreground="#1B5B6A" MinWidth="90"/>
+            </Border>
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="Hit Ratio" FontSize="18" Foreground="#1B5B6A" Margin="0,10,8,0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+            <Border Grid.Row="1" Grid.Column="3" Background="White" BorderBrush="#9DB9C2" BorderThickness="1" CornerRadius="2" Margin="0,10,0,0" Padding="8,2" VerticalAlignment="Center">
+                <TextBlock x:Name="HitRatioValueText" FontSize="18" Foreground="#1B5B6A" MinWidth="90"/>
+            </Border>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Average Process Time" FontSize="18" Foreground="#1B5B6A" Margin="0,10,0,0" VerticalAlignment="Center"/>
+            <Border Grid.Row="2" Grid.Column="1" Background="White" BorderBrush="#9DB9C2" BorderThickness="1" CornerRadius="2" Margin="0,10,0,0" Padding="8,2" VerticalAlignment="Center">
+                <TextBlock x:Name="AverageProcessTimeValueText" FontSize="18" Foreground="#1B5B6A" MinWidth="90"/>
+            </Border>
+        </Grid>
+
         <!-- Current Application Status label -->
-        <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="Current Application Status:" FontSize="24" Foreground="#1B5B6A" Margin="40,30,0,15"/>
+        <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Text="Current Application Status:" FontSize="24" Foreground="#1B5B6A" Margin="40,30,0,15"/>
 
         <!-- Status cards -->
-        <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="30,10,30,10">
+        <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="30,10,30,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
@@ -53,13 +93,13 @@
 
         <!-- Info message below the status cards -->
         <TextBlock x:Name="InfoTextBlock"
-                   Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
+                   Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
                    HorizontalAlignment="Center" VerticalAlignment="Top"
                    Margin="0,10,0,0" Foreground="#1B5B6A" FontSize="16"
                    Visibility="Collapsed" TextWrapping="Wrap" TextAlignment="Center"/>
 
         <!-- Action buttons -->
-        <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,40,0,20" >
+        <StackPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,40,0,20" >
             <Button x:Name="StartButton" Content="Start" Width="260" Height="64" Style="{StaticResource StartButtonStyle}" FontSize="22" Margin="20,0" Click="StartButton_Click"/>
             <Button x:Name="StopButton" Content="Stop" Width="260" Height="64" Style="{StaticResource StopButtonStyle}" FontSize="22" Margin="20,0" Click="StopButton_Click"/>
         </StackPanel>

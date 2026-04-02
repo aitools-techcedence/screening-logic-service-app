@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using ScreeningLogicServiceApp.Models;
 
 namespace ScreeningLogicServiceApp.Views
 {
@@ -87,6 +88,28 @@ namespace ScreeningLogicServiceApp.Views
         {
             InfoTextBlock.Text = string.Empty;
             InfoTextBlock.Visibility = Visibility.Collapsed;
+        }
+
+        public void SetDashboardMetrics(IncomingOrderDashboardMetrics metrics)
+        {
+            ApplicationProcessedValueText.Text = metrics.ApplicationProcessedCount.ToString();
+            SinceValueText.Text = metrics.Since?.ToString("MM/dd/yyyy hh:mm tt") ?? "-";
+            HitRatioValueText.Text = $"{metrics.HitRatioPercent:0.##}%";
+            AverageProcessTimeValueText.Text = FormatDuration(metrics.AverageProcessTime);
+            AverageTurnaroundValueText.Text = FormatDuration(metrics.AverageTurnaround);
+        }
+
+        private static string FormatDuration(TimeSpan? duration)
+        {
+            if (!duration.HasValue)
+            {
+                return "-";
+            }
+
+            var value = duration.Value;
+            return value.TotalHours >= 1
+                ? $"{(int)value.TotalHours}h {value.Minutes}m"
+                : $"{value.Minutes}m";
         }
     }
 }

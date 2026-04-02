@@ -4,6 +4,8 @@ namespace ScreeningLogicServiceApp.Repository;
 
 public interface IIncomingOrderSearchRepository
 {
+    Task<IncomingOrderDashboardMetrics> GetDashboardMetricsAsync();
+
     Task<IReadOnlyList<IncomingOrderSearchResult>> SearchIncomingOrdersAsync(
         string? orderNumber,
         string? lastName,
