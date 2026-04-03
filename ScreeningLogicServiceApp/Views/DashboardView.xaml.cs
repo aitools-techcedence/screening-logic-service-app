@@ -107,9 +107,11 @@ namespace ScreeningLogicServiceApp.Views
             }
 
             var value = duration.Value;
-            return value.TotalHours >= 1
-                ? $"{(int)value.TotalHours}h {value.Minutes}m"
-                : $"{value.Minutes}m";
+            if (value.TotalHours >= 1)
+                return $"{(int)value.TotalHours}h {value.Minutes}m";
+            if (value.TotalMinutes >= 1)
+                return $"{value.Minutes}m {value.Seconds}s";
+            return $"{value.Seconds}s";
         }
     }
 }

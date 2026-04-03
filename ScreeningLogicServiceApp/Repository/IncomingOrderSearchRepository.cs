@@ -39,17 +39,15 @@ SELECT
         END
     AS decimal(5,2)) AS HitRatioPercent,
     AVG(CAST(CASE
-        WHEN UpdatedAt IS NOT NULL AND COALESCE(StartProcess, ReceivedAt) IS NOT NULL
-            THEN DATEDIFF_BIG(MILLISECOND, COALESCE(StartProcess, ReceivedAt), UpdatedAt)
-        ELSE NULL
+        WHEN StartProcess IS NOT NULL AND UpdatedAt IS NOT NULL
+            THEN DATEDIFF_BIG(MILLISECOND, StartProcess, UpdatedAt)
     END AS float)) AS AverageProcessTimeMs,
     AVG(CAST(CASE
-        WHEN UpdatedAt IS NOT NULL AND ReceivedAt IS NOT NULL
+        WHEN ReceivedAt IS NOT NULL AND UpdatedAt IS NOT NULL
             THEN DATEDIFF_BIG(MILLISECOND, ReceivedAt, UpdatedAt)
-        ELSE NULL
     END AS float)) AS AverageTurnaroundMs
 FROM {_tableName}
-WHERE UPPER(LTRIM(RTRIM(ISNULL(Status, '')))) = 'COMPLETED';";
+WHERE Status = 'Completed';";
 
         await using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
