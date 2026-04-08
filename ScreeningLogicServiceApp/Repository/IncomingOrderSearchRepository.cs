@@ -41,11 +41,7 @@ SELECT
     AVG(CAST(CASE
         WHEN StartProcess IS NOT NULL AND UpdatedAt IS NOT NULL
             THEN DATEDIFF_BIG(MILLISECOND, StartProcess, UpdatedAt)
-    END AS float)) AS AverageProcessTimeMs,
-    AVG(CAST(CASE
-        WHEN ReceivedAt IS NOT NULL AND UpdatedAt IS NOT NULL
-            THEN DATEDIFF_BIG(MILLISECOND, ReceivedAt, UpdatedAt)
-    END AS float)) AS AverageTurnaroundMs
+    END AS float)) AS AverageProcessTimeMs
 FROM {_tableName}
 WHERE Status = 'Completed';";
 
@@ -67,8 +63,7 @@ WHERE Status = 'Completed';";
             HitRatioPercent = reader.IsDBNull(reader.GetOrdinal("HitRatioPercent"))
                 ? 0m
                 : reader.GetDecimal(reader.GetOrdinal("HitRatioPercent")),
-            AverageProcessTime = GetDurationFromMilliseconds(reader, "AverageProcessTimeMs"),
-            AverageTurnaround = GetDurationFromMilliseconds(reader, "AverageTurnaroundMs")
+            AverageProcessTime = GetDurationFromMilliseconds(reader, "AverageProcessTimeMs")
         };
     }
 

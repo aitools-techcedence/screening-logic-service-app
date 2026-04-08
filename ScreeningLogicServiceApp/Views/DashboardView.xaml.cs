@@ -96,7 +96,6 @@ namespace ScreeningLogicServiceApp.Views
             SinceValueText.Text = metrics.Since?.ToString("MM/dd/yyyy hh:mm tt") ?? "-";
             HitRatioValueText.Text = $"{metrics.HitRatioPercent:0.##}%";
             AverageProcessTimeValueText.Text = FormatDuration(metrics.AverageProcessTime);
-            AverageTurnaroundValueText.Text = FormatDuration(metrics.AverageTurnaround);
         }
 
         private static string FormatDuration(TimeSpan? duration)
